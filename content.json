@@ -1,0 +1,32 @@
+{
+  "name": "tenzou",
+  "intro": "Hi, I'm Tenzou. I build things. Sometimes I write code & the other time's I tinker with servers. I like clean interfaces, tiny automation & late-night debugging. You'll find all my projects, notes & experiments here. 🖤",
+  "version": "v1.2.0-9f2c1ab",
+  "github": "",
+  "socials": [
+    { "type": "email", "url": "mailto:hello@tenzou.dev" },
+    { "type": "github", "url": "https://github.com/tenzou" },
+    { "type": "x", "url": "https://x.com/tenzou" },
+    { "type": "telegram", "url": "https://t.me/tenzou" }
+  ],
+  "posts": [
+    {
+      "title": "Why I still ship a single HTML file",
+      "date": "2026-10-12",
+      "summary": "No build step, no dependencies, no drama. A love letter to the boring web.",
+      "url": ""
+    },
+    {
+      "title": "Notes on running a head unit as a daily driver",
+      "date": "2026-08-03",
+      "summary": "What broke, what I replaced, and why the launcher matters more than the hardware.",
+      "url": ""
+    },
+    {
+      "title": "Small tools, small problems",
+      "date": "2026-05-21",
+      "summary": "The best side projects are the ones that solve exactly one annoying thing.",
+      "url": ""
+    }
+  ]
+}

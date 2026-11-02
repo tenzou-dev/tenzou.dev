@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tenzou.dev</title>
+  <meta name="description" content="Tenzou builds things. Projects, notes and experiments — in code, servers and small tools.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="tenzou.dev">
+  <meta property="og:description" content="Tenzou builds things. Projects, notes and experiments.">
+  <meta property="og:url" content="https://tenzou.dev">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Crect x='13.5' y='7' width='4' height='18' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <script>
+    try {
+      var saved = localStorage.getItem("tenzou-theme");
+      if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <noscript><style>.hero { opacity: 1 !important; }</style></noscript>
+</head>
+<body data-page="home">
+  <div class="shell">
+    <header class="top">
+      <a class="brand" href="index.html" aria-label="tenzou.dev — home">
+        <span class="mark" aria-hidden="true"></span>
+        <span data-brand>tenzou.</span>
+      </a>
+      <nav class="top-links" aria-label="Account and appearance">
+        <a href="admin.html">sign in.</a>
+        <button class="theme" type="button" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">light.</button>
+      </nav>
+    </header>
+
+    <main class="main">
+      <div class="hero">
+        <h1 class="name" data-name aria-label="tenzou"></h1>
+
+        <div class="intro">
+          <p data-intro></p>
+          <p class="coords" data-where hidden></p>
+          <div class="socials" data-socials hidden></div>
+          <noscript><p>This page needs JavaScript to load its content.</p></noscript>
+        </div>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <div class="foot-links">
+        <span class="mark" aria-hidden="true"></span>
+        <a href="projects.html">/projects</a>
+        <a href="blog.html">/blog</a>
+      </div>
+      <span class="version" data-version>v1.2.0-9f2c1ab</span>
+    </footer>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+  <script src="assets/theme.js"></script>
+  <script src="assets/site.js"></script>
+</body>
+</html>

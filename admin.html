@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>admin — tenzou.dev</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Crect x='13.5' y='7' width='4' height='18' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <script>
+    try {
+      var saved = localStorage.getItem("tenzou-theme");
+      if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+</head>
+<body data-page="admin">
+  <div class="shell">
+    <header class="top">
+      <a class="brand" href="index.html" aria-label="tenzou.dev — home">
+        <span class="mark" aria-hidden="true"></span>
+        <span data-brand>tenzou.</span>
+      </a>
+      <nav class="top-links" aria-label="Navigasi">
+        <a href="index.html">site.</a>
+        <button class="theme" type="button" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">light.</button>
+      </nav>
+    </header>
+
+    <main class="page admin">
+      <p class="kicker">/admin</p>
+      <h1 class="page-title">Content editor.</h1>
+      <p class="page-sub">Ubah isi situs dari sini. Tersimpan di Cloudflare KV dan langsung tampil untuk semua pengunjung.</p>
+
+      <p class="offline-note" data-offline hidden>
+        API tidak tersedia di host ini, jadi penyimpanan tidak bisa dipakai. Buka lewat Cloudflare Pages,
+        atau jalankan <code>node dev-server.mjs</code> di lokal.
+      </p>
+
+      <form class="login" data-login hidden>
+        <label class="field">
+          <span class="field-label" for="admin-password">password</span>
+          <input class="input" id="admin-password" type="password" autocomplete="current-password" data-password required>
+        </label>
+        <div>
+          <button class="btn" type="submit">masuk</button>
+        </div>
+        <p class="status" data-login-status role="status"></p>
+      </form>
+
+      <form class="editor" data-editor hidden>
+        <section class="panel">
+          <h2 class="panel-title">profil</h2>
+          <div class="grid-2">
+            <label class="field">
+              <span class="field-label">nama (maks 12, tampil vertikal)</span>
+              <input class="input" data-field="name" maxlength="12" required>
+            </label>
+            <label class="field">
+              <span class="field-label">versi di footer</span>
+              <input class="input" data-field="version" maxlength="40" placeholder="v1.2.0-9f2c1ab">
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">intro</span>
+            <textarea class="input textarea" rows="7" maxlength="700" data-field="intro"></textarea>
+          </label>
+          <label class="field">
+            <span class="field-label">username github (untuk halaman /projects)</span>
+            <input class="input" data-field="github" maxlength="39" placeholder="tenzou">
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">sosial</h2>
+            <button class="btn btn--ghost btn--sm" type="button" data-add-social>+ tambah</button>
+          </div>
+          <div class="editor-list" data-socials-editor></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">tulisan</h2>
+            <button class="btn btn--ghost btn--sm" type="button" data-add-post>+ tambah</button>
+          </div>
+          <div class="editor-list" data-posts-editor></div>
+        </section>
+
+        <div class="editor-actions">
+          <button class="btn" type="submit">simpan</button>
+          <button class="btn btn--ghost" type="button" data-reload>muat ulang</button>
+          <button class="btn btn--ghost" type="button" data-logout>keluar</button>
+          <span class="status" data-status role="status"></span>
+        </div>
+      </form>
+    </main>
+
+    <footer class="foot">
+      <div class="foot-links">
+        <span class="mark" aria-hidden="true"></span>
+        <a href="projects.html">/projects</a>
+        <a href="blog.html">/blog</a>
+      </div>
+      <span class="version" data-version>v1.2.0-9f2c1ab</span>
+    </footer>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+  <script src="assets/theme.js"></script>
+  <script src="assets/site.js"></script>
+  <script src="assets/admin.js"></script>
+</body>
+</html>
