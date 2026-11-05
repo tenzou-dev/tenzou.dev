@@ -113,8 +113,8 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Versi footer**: `GET /api/status` membaca `CF_PAGES_COMMIT_SHA`, menghitung commit
   lewat GitHub API, lalu menampilkan `v1.<jumlah commit>.0-<short sha>`. Hasilnya
   di-cache di KV (`site:status`), jadi tidak memanggil GitHub di setiap request.
-- **Uptime**: baris `online ...` di bawah koordinat dihitung dari tanggal repo dibuat
-  dan berdetak tiap detik di browser.
+- **Uptime**: angka `hari.jammenitdetikratusan` (contoh `3.13542030`) di bawah
+  koordinat, dihitung dari tanggal repo dibuat dan berdetak tiap frame.
 - **Tema**: `localStorage` (`tenzou-theme`), tombol `light.` / `dark.`, shortcut `t`.
 
 ## Yang perlu diganti

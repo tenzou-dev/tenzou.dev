@@ -168,21 +168,27 @@
     const pad = (value) => String(value).padStart(2, "0");
 
     const tick = () => {
-      let left = Math.max(0, Math.floor((Date.now() - started) / 1000));
-      const days = Math.floor(left / 86400);
-      left %= 86400;
-      const hours = Math.floor(left / 3600);
-      left %= 3600;
-      const minutes = Math.floor(left / 60);
-      const seconds = left % 60;
+      const total = Math.max(0, Date.now() - started);
+      const days = Math.floor(total / 86400000);
+      const hours = Math.floor(total / 3600000) % 24;
+      const minutes = Math.floor(total / 60000) % 60;
+      const seconds = Math.floor(total / 1000) % 60;
+      const hundredths = Math.floor(total / 10) % 100;
 
       el.textContent =
-        "online " + days + "d " + pad(hours) + "h " + pad(minutes) + "m " + pad(seconds) + "s";
+        days + "." + pad(hours) + pad(minutes) + pad(seconds) + pad(hundredths);
       el.hidden = false;
     };
 
+    el.title = "Site uptime (days.hhmmss.hh)";
     tick();
-    setInterval(tick, 1000);
+
+    const frame = () => {
+      tick();
+      requestAnimationFrame(frame);
+    };
+
+    requestAnimationFrame(frame);
   }
 
   async function renderWhere(el) {
