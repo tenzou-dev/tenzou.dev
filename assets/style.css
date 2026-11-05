@@ -23,7 +23,7 @@
   --ok: #6ee7a8;
   --err: #ff8080;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --pad-x: clamp(20px, 5.5vw, 44px);
+  --pad-x: clamp(24px, 7vw, 44px);
   --pad-y: clamp(18px, 3.5vh, 30px);
   color-scheme: dark;
 }
@@ -168,7 +168,7 @@ a {
 .hero {
   display: flex;
   align-items: center;
-  gap: clamp(18px, 5vw, 48px);
+  gap: clamp(16px, 4.4vw, 44px);
   width: 100%;
   max-width: 660px;
   opacity: 0;
@@ -185,9 +185,9 @@ body.content-ready .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: clamp(38px, 11.8vw, 58px);
+  font-size: clamp(32px, 9.6vw, 52px);
   font-weight: 200;
-  line-height: 1.26;
+  line-height: 1.22;
   letter-spacing: 0.01em;
   user-select: none;
   -webkit-user-select: none;
@@ -206,8 +206,8 @@ body.content-ready .hero {
 
 .intro p {
   margin: 0;
-  font-size: clamp(14px, 3.85vw, 16px);
-  line-height: 1.52;
+  font-size: clamp(13.5px, 3.6vw, 15.5px);
+  line-height: 1.55;
   color: var(--fg);
   text-wrap: pretty;
 }
@@ -333,14 +333,19 @@ body.content-ready .hero {
 
 .row {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 12px;
+  gap: 8px 12px;
   padding: 16px 2px 6px;
   color: var(--fg);
 }
 
 .row-title {
   font-size: clamp(14.5px, 3.9vw, 15.5px);
+}
+
+body[data-page="projects"] .row-title {
+  font-weight: 600;
 }
 
 .row:hover .row-title {
@@ -352,6 +357,30 @@ body.content-ready .hero {
   margin-left: auto;
   color: var(--dim);
   font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.row-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: auto;
+  flex: none;
+}
+
+.row-side .row-meta {
+  margin-left: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--hair);
+  border-radius: 3px;
+  color: var(--dim);
+  font-size: 10.5px;
+  line-height: 1.65;
+  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
@@ -594,18 +623,51 @@ body.content-ready .hero {
   font-size: 12px;
 }
 
-.btn--github {
-  display: inline-flex;
+.signin-head {
+  display: flex;
   align-items: center;
-  gap: 9px;
-  align-self: flex-start;
-  text-decoration: none;
+  gap: clamp(14px, 3.5vw, 20px);
+  margin-bottom: clamp(16px, 3vh, 22px);
 }
 
-.btn--github svg {
-  width: 16px;
-  height: 16px;
-  flex: none;
+.signin-head .page-title {
+  margin: 0;
+}
+
+.page-title--xl {
+  font-size: clamp(42px, 9vw, 60px);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.github-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--fg);
+}
+
+.github-login .signin-bar {
+  color: var(--dim);
+  font-size: clamp(28px, 7vw, 38px);
+  font-weight: 200;
+  line-height: 1;
+}
+
+.github-login svg {
+  width: 48px;
+  height: 48px;
+  padding: 11px;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.github-login:hover svg {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
 }
 
 .editor-list {
@@ -802,7 +864,25 @@ body.content-ready .hero {
   }
 
   .name {
-    font-size: 34px;
+    font-size: 31px;
+  }
+
+  .page-title--xl {
+    font-size: 36px;
+  }
+
+  .github-login {
+    gap: 10px;
+  }
+
+  .github-login .signin-bar {
+    font-size: 30px;
+  }
+
+  .github-login svg {
+    width: 42px;
+    height: 42px;
+    padding: 9px;
   }
 }
 

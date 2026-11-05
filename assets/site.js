@@ -358,21 +358,34 @@
           title.className = "row-title";
           title.textContent = repo.name;
 
+          const side = document.createElement("span");
+          side.className = "row-side";
+
+          if (repo.language) {
+            const badge = document.createElement("span");
+            badge.className = "badge";
+            badge.textContent = repo.language;
+            side.append(badge);
+          }
+
           const metaBits = [];
-          if (repo.language) metaBits.push(repo.language);
           if (repo.stargazers_count > 0) metaBits.push("★ " + repo.stargazers_count);
           if (repo.archived) metaBits.push("archived");
 
-          const meta = document.createElement("span");
-          meta.className = "row-meta";
-          meta.textContent = metaBits.join(" · ");
+          if (metaBits.length) {
+            const meta = document.createElement("span");
+            meta.className = "row-meta";
+            meta.textContent = metaBits.join(" · ");
+            side.append(meta);
+          }
 
           const arrow = document.createElement("span");
           arrow.className = "row-arrow";
           arrow.setAttribute("aria-hidden", "true");
           arrow.textContent = "↗";
+          side.append(arrow);
 
-          link.append(title, meta, arrow);
+          link.append(title, side);
           li.append(link);
 
           if (repo.description) {

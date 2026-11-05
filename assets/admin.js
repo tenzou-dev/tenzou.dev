@@ -408,6 +408,7 @@
   async function openEditor(login) {
     sessionLogin = login || "";
     loginBox.hidden = true;
+    githubLogin.hidden = true;
     editorForm.hidden = false;
     offlineEl.hidden = true;
     setTitle("Content.");
