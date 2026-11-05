@@ -9,6 +9,7 @@
     { "type": "x", "url": "https://x.com/tenzou" },
     { "type": "telegram", "url": "https://t.me/tenzou" }
   ],
+  "projects": [],
   "posts": [
     {
       "title": "Why I still ship a single HTML file",

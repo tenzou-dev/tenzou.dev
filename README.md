@@ -6,9 +6,9 @@ lewat Pages Functions. Tanpa framework, tanpa build step.
 ```
 tenzou-dev/
 ├─ index.html            # home
-├─ projects.html         # /projects  (auto dari GitHub API)
+├─ projects.html         # /projects  (project manual + repo GitHub)
 ├─ blog.html             # /blog
-├─ admin.html            # /admin     (password)
+├─ admin.html            # /admin     (login GitHub)
 ├─ content.json          # default content (dipakai kalau KV masih kosong)
 ├─ assets/
 │  ├─ style.css
@@ -16,9 +16,16 @@ tenzou-dev/
 │  ├─ site.js            # render halaman publik
 │  └─ admin.js           # editor konten
 ├─ functions/
-│  ├─ _lib/http.js
+│  ├─ _lib/
+│  │  ├─ auth.js         # GitHub OAuth + session cookie
+│  │  └─ http.js
 │  └─ api/
-│     ├─ auth.js         # POST /api/auth
+│     ├─ auth.js         # POST /api/auth (password lokal)
+│     ├─ auth/
+│     │  ├─ config.js    # GET /api/auth/config
+│     │  ├─ github.js    # GET /api/auth/github
+│     │  ├─ callback.js  # GET /api/auth/callback
+│     │  └─ session.js   # GET / DELETE /api/auth/session
 │     ├─ content.js      # GET / PUT /api/content
 │     └─ where.js        # GET /api/where (lokasi pengunjung via request.cf)
 ├─ dev-server.mjs        # server lokal (menjalankan Functions yang sama)
@@ -36,7 +43,8 @@ node dev-server.mjs
 # http://127.0.0.1:4173
 ```
 
-Password admin default `admin` (bisa diganti):
+Di lokal, login memakai password (default `admin`, bisa diganti). GitHub OAuth
+tidak diaktifkan kecuali kamu mengisi variabel `GITHUB_*` — lihat `DEPLOY.md`.
 
 ```powershell
 $env:ADMIN_PASSWORD="rahasia"; node dev-server.mjs
@@ -45,41 +53,59 @@ $env:ADMIN_PASSWORD="rahasia"; node dev-server.mjs
 Konten yang disimpan lewat `/admin` di mode lokal masuk ke `.dev-content.json`
 (sudah di-gitignore). Hapus file itu untuk kembali ke `content.json`.
 
+> Default `admin` **hanya untuk dev-server lokal**. Di Cloudflare, login memakai
+> GitHub OAuth; `ADMIN_PASSWORD` hanya fallback opsional.
+
 ## Deploy ke Cloudflare Pages
 
 Panduan langkah demi langkah + troubleshooting ada di **[DEPLOY.md](DEPLOY.md)**.
 Ringkasnya:
 
 1. Push folder ini ke repo GitHub.
-2. Dashboard Cloudflare → **Workers & Pages → Create → Pages → Connect to Git**.
+2. Dashboard Cloudflare → **Workers & Pages** → **Create application** → tab **Pages**
+   (bukan Workers) → **Connect to Git**.
 3. Build command: kosong. Output directory: `/` (atau `tenzou-dev` kalau di dalam monorepo).
 4. **Buat KV namespace**: Workers & Pages → **KV** → Create instance, misal `tenzou-content`.
 5. Di project Pages → **Settings → Bindings → Add → KV namespace**:
    - Variable name: `CONTENT`
    - KV namespace: `tenzou-content`
-6. Di **Settings → Variables and Secrets → Add**:
-   - `ADMIN_PASSWORD` = password panjang (minimal 20 karakter, ini satu-satunya proteksi)
-   - pilih tipe **Secret**
-7. Deploy ulang, lalu buka `https://tenzou.dev/admin`.
-8. Custom domain `tenzou.dev` di tab **Custom domains**.
+6. Buat **GitHub OAuth App** (GitHub → Settings → Developer settings → OAuth Apps):
+   - **Homepage URL**: `https://<project>.pages.dev`
+   - **Authorization callback URL**: `https://<project>.pages.dev/api/auth/callback`
+7. Di **Settings → Variables and Secrets → Add**:
+   - `GITHUB_CLIENT_ID` (text)
+   - `GITHUB_CLIENT_SECRET` (Secret)
+   - `GITHUB_OWNER` = username GitHub kamu
+   - `SESSION_SECRET` = string acak 32+ karakter (Secret)
+   - `ADMIN_PASSWORD` (opsional, hanya fallback lokal/CLI)
+8. Deploy ulang, buka `https://<project>.pages.dev/admin`, klik **Sign in with GitHub**.
+9. Custom domain `tenzou.dev` di tab **Custom domains** (kalau sudah punya domainnya).
 
 Selama KV masih kosong, situs memakai `content.json` apa adanya. Setelah kamu
 menekan **simpan** di `/admin`, isi KV yang dipakai.
 
+> Kalau nanti pindah ke `tenzou.dev`, ubah **Authorization callback URL** di OAuth App
+> menjadi `https://tenzou.dev/api/auth/callback`, atau set `OAUTH_CALLBACK_URL`.
+
 ### Setelah deploy pertama
 
-1. Buka `/admin`, masuk pakai `ADMIN_PASSWORD`.
-2. Isi **username github** — ini yang dipakai halaman `/projects`. Tanpa ini halaman
-   projects cuma menampilkan pesan kosong.
-3. Rapikan intro, sosial, dan tulisan, lalu **simpan**.
+1. Buka `/admin`, klik **Sign in with GitHub** (hanya akun `GITHUB_OWNER` yang diterima).
+2. Isi **username github** — ini yang dipakai halaman `/projects` untuk repo publik.
+3. Tambah **project manual** untuk karya yang tidak ada di GitHub.
+4. Rapikan intro, sosial, dan tulisan, lalu **simpan**.
 
 ## Cara kerja
 
 - **Konten**: `GET /api/content` mengembalikan isi KV, atau `null` → situs fallback ke `content.json`.
-  `PUT /api/content` butuh header `Authorization: Bearer <ADMIN_PASSWORD>`, memvalidasi lalu menulis ke KV.
-- **Projects**: `projects.html` memanggil GitHub API (`/users/<username>/repos?type=owner`),
-  jadi hanya repo **publik** yang muncul. Repo internal instansi tidak pernah ikut.
-  Hasil di-cache 10 menit di sessionStorage supaya tidak kena rate limit.
+  `PUT /api/content` butuh session GitHub (cookie) atau `Authorization: Bearer <ADMIN_PASSWORD>`,
+  memvalidasi lalu menulis ke KV.
+- **Projects**: halaman `/projects` menggabungkan dua sumber:
+  1. **Project manual** dari `/admin` — untuk karya yang tidak ada di GitHub.
+  2. **Repo publik** dari GitHub API (`/users/<username>/repos?type=owner`).
+  Repo internal instansi tidak pernah ikut. Hasil GitHub di-cache 10 menit.
+- **Login**: GitHub OAuth (`/api/auth/github` → `/api/auth/callback`). Hanya
+  `GITHUB_OWNER` (dan `GITHUB_ALLOWED_USERS`) yang boleh masuk. Session berupa
+  cookie HttpOnly bertanda tangan `SESSION_SECRET`, berlaku 7 hari.
 - **Koordinat**: `GET /api/where` membaca `request.cf.latitude/longitude` (data geo Cloudflare).
   Tidak ada GPS prompt, tidak ada request ke pihak ketiga, dan tidak disimpan.
   Saat lokal, dev-server mengirim koordinat contoh.
@@ -90,20 +116,48 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 | Hal | Di mana |
 | --- | --- |
 | Nama, intro, versi, username GitHub, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
-| Link sosial | `/admin` → bagian sosial |
+| Project manual (di luar GitHub) | `/admin` → bagian **project manual** |
+| Link sosial | `/admin` → bagian **sosial** |
 | Username GitHub | `/admin` → "username github" |
-| Password admin | Environment variable `ADMIN_PASSWORD` |
+| Login GitHub | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_OWNER`, `SESSION_SECRET` |
+| Password fallback | `ADMIN_PASSWORD` (opsional) |
 | Nama domain / meta OG | `<head>` tiap halaman |
 
-Catatan keamanan: password dikirim sebagai Bearer token di setiap penyimpanan (HTTPS),
-tidak disimpan di cookie, dan hanya disimpan di `sessionStorage` browser kamu.
-Karena tidak ada rate limit, pakai password yang panjang dan acak.
+## Repo ini publik — aman?
+
+Ya, selama secret tidak pernah ditulis di file. Isi repo ini bukan rahasia:
+kode HTML/CSS/JS, `functions/`, `content.json`, dan dokumentasi. Siapa pun boleh
+melihatnya — keamanan `/admin` tidak bergantung pada kode yang disembunyikan,
+tetapi pada GitHub OAuth dan `SESSION_SECRET` yang hanya disimpan di Cloudflare.
+
+| Boleh publik | Jangan pernah di-commit |
+| --- | --- |
+| `content.json`, HTML, CSS, JS | `GITHUB_CLIENT_SECRET` |
+| Kode `functions/` | `SESSION_SECRET` |
+| `README.md`, `DEPLOY.md` | `ADMIN_PASSWORD` (kalau dipakai) |
+| Username GitHub & link sosial | Cloudflare API token |
+|  | `.dev-content.json` (sudah di-gitignore) |
+|  | `.env`, `.dev.vars` |
+
+Kalau orang tahu alamat `/admin`, itu tidak masalah — tanpa akun GitHub yang
+diizinkan, login ditolak. Hanya `GITHUB_OWNER` (dan `GITHUB_ALLOWED_USERS` kalau
+diisi) yang bisa masuk.
+
+Catatan teknis: setelah login, server membuat cookie `tz_session` yang HttpOnly,
+SameSite=Lax, dan ditandatangani HMAC-SHA256 dengan `SESSION_SECRET` (berlaku 7 hari).
+Token GitHub tidak disimpan. `ADMIN_PASSWORD` hanya fallback opsional untuk
+lokal/CLI. Tidak ada rate limit bawaan, jadi aktifkan Cloudflare **Rate limiting**
+untuk `/api/auth/*` kalau mau ekstra.
 
 ## Struktur Functions
 
 `functions/` otomatis jadi route di Cloudflare Pages:
 
-- `/api/auth` → `functions/api/auth.js`
+- `/api/auth` → `functions/api/auth.js` (password lokal)
+- `/api/auth/config` → `functions/api/auth/config.js`
+- `/api/auth/github` → `functions/api/auth/github.js`
+- `/api/auth/callback` → `functions/api/auth/callback.js`
+- `/api/auth/session` → `functions/api/auth/session.js`
 - `/api/content` → `functions/api/content.js`
 - `/api/where` → `functions/api/where.js`
 

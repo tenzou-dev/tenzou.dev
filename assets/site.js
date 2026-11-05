@@ -266,80 +266,143 @@
 
     const user = String(content.github || "").replace(/[^a-zA-Z0-9-]/g, "");
     const profile = "https://github.com/" + user;
+    const manual = (Array.isArray(content.projects) ? content.projects : []).filter(
+      (project) => project && String(project.title || "").trim()
+    );
+    const manualUrls = new Set(
+      manual.map((project) => safeUrl(project.url, false)).filter(Boolean)
+    );
 
-    if (sub && user) {
-      sub.textContent = "Public repos only, pulled live from GitHub — ";
-      const link = document.createElement("a");
-      link.href = profile;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.className = "inline-link";
-      link.textContent = "@" + user;
-      sub.append(link, ".");
-    }
+    if (sub) {
+      sub.textContent = "";
 
-    if (!user) {
-      list.textContent = "";
-      list.append(listNote("no github username set — add one in /admin."));
-      return;
-    }
-
-    const repoCacheKey = "tenzou-repos-" + user.toLowerCase();
-
-    const paint = (repos) => {
-      list.textContent = "";
-
-      if (!repos.length) {
-        list.append(listNote("no public repos yet."));
-        return;
+      if (manual.length) {
+        sub.append("Selected work");
+        if (user) sub.append(", plus public repos from GitHub — ");
+        else sub.append(".");
+      } else if (user) {
+        sub.append("Public repos from GitHub — ");
+      } else {
+        sub.append("Selected work and public repositories.");
       }
 
-      repos.forEach((repo) => {
-        const li = document.createElement("li");
+      if (user) {
         const link = document.createElement("a");
-        link.className = "row";
-        link.href = repo.html_url;
+        link.href = profile;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
+        link.className = "inline-link";
+        link.textContent = "@" + user;
+        sub.append(link, ".");
+      }
+    }
+
+    const paint = (repos, emptyNote) => {
+      list.textContent = "";
+
+      manual.forEach((project) => {
+        const li = document.createElement("li");
+        const url = safeUrl(project.url, false);
+        const row = url ? document.createElement("a") : document.createElement("span");
+        row.className = "row";
+
+        if (url) {
+          row.href = url;
+          if (/^https?:/i.test(url)) {
+            row.target = "_blank";
+            row.rel = "noopener noreferrer";
+          }
+        }
 
         const title = document.createElement("span");
         title.className = "row-title";
-        title.textContent = repo.name;
-
-        const metaBits = [];
-        if (repo.language) metaBits.push(repo.language);
-        if (repo.stargazers_count > 0) metaBits.push("★ " + repo.stargazers_count);
-        if (repo.archived) metaBits.push("archived");
+        title.textContent = String(project.title || "").trim();
 
         const meta = document.createElement("span");
         meta.className = "row-meta";
-        meta.textContent = metaBits.join(" · ");
+        meta.textContent = String(project.meta || "").trim();
 
-        const arrow = document.createElement("span");
-        arrow.className = "row-arrow";
-        arrow.setAttribute("aria-hidden", "true");
-        arrow.textContent = "↗";
+        row.append(title, meta);
 
-        link.append(title, meta, arrow);
-        li.append(link);
+        if (url) {
+          const arrow = document.createElement("span");
+          arrow.className = "row-arrow";
+          arrow.setAttribute("aria-hidden", "true");
+          arrow.textContent = "↗";
+          row.append(arrow);
+        }
 
-        if (repo.description) {
+        li.append(row);
+
+        if (project.description) {
           const desc = document.createElement("p");
           desc.className = "row-desc";
-          desc.textContent = repo.description;
+          desc.textContent = String(project.description).trim();
           li.append(desc);
         }
 
         list.append(li);
       });
+
+      repos
+        .filter((repo) => !manualUrls.has(repo.html_url))
+        .forEach((repo) => {
+          const li = document.createElement("li");
+          const link = document.createElement("a");
+          link.className = "row";
+          link.href = repo.html_url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+
+          const title = document.createElement("span");
+          title.className = "row-title";
+          title.textContent = repo.name;
+
+          const metaBits = [];
+          if (repo.language) metaBits.push(repo.language);
+          if (repo.stargazers_count > 0) metaBits.push("★ " + repo.stargazers_count);
+          if (repo.archived) metaBits.push("archived");
+
+          const meta = document.createElement("span");
+          meta.className = "row-meta";
+          meta.textContent = metaBits.join(" · ");
+
+          const arrow = document.createElement("span");
+          arrow.className = "row-arrow";
+          arrow.setAttribute("aria-hidden", "true");
+          arrow.textContent = "↗";
+
+          link.append(title, meta, arrow);
+          li.append(link);
+
+          if (repo.description) {
+            const desc = document.createElement("p");
+            desc.className = "row-desc";
+            desc.textContent = repo.description;
+            li.append(desc);
+          }
+
+          list.append(li);
+        });
+
+      if (!list.children.length && emptyNote) {
+        list.append(listNote(emptyNote));
+      }
     };
+
+    if (!user) {
+      paint([], manual.length ? "" : "nothing here yet.");
+      return;
+    }
+
+    const repoCacheKey = "tenzou-repos-" + user.toLowerCase();
 
     try {
       const cached = sessionStorage.getItem(repoCacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && Date.now() - parsed.at < 10 * 60 * 1000 && Array.isArray(parsed.repos)) {
-          paint(parsed.repos);
+          paint(parsed.repos, "no public repos yet.");
           return;
         }
       }
@@ -347,7 +410,7 @@
       /* ignore */
     }
 
-    list.textContent = "";
+    paint([], "");
     list.append(listNote("fetching repos…"));
 
     const controller = new AbortController();
@@ -383,21 +446,21 @@
           /* ignore */
         }
 
-        paint(clean);
+        paint(clean, "no public repos yet.");
       })
       .catch(() => {
         try {
           const cached = sessionStorage.getItem(repoCacheKey);
           const parsed = cached ? JSON.parse(cached) : null;
           if (parsed && Array.isArray(parsed.repos) && parsed.repos.length) {
-            paint(parsed.repos);
+            paint(parsed.repos, "no public repos yet.");
             return;
           }
         } catch (e) {
           /* ignore */
         }
 
-        list.textContent = "";
+        paint([], "");
         const li = listNote("gagal memuat repo dari GitHub.");
         const link = document.createElement("a");
         link.className = "inline-link";

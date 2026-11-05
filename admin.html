@@ -33,24 +33,30 @@
 
     <main class="page admin">
       <p class="kicker">/admin</p>
-      <h1 class="page-title">Content editor.</h1>
-      <p class="page-sub">Ubah isi situs dari sini. Tersimpan di Cloudflare KV dan langsung tampil untuk semua pengunjung.</p>
+      <h1 class="page-title" data-admin-title>Sign in.</h1>
 
       <p class="offline-note" data-offline hidden>
-        API tidak tersedia di host ini, jadi penyimpanan tidak bisa dipakai. Buka lewat Cloudflare Pages,
-        atau jalankan <code>node dev-server.mjs</code> di lokal.
+        Admin tidak tersedia di host ini. Jalankan lewat Cloudflare Pages, atau
+        <code>node dev-server.mjs</code> di lokal.
       </p>
 
-      <form class="login" data-login hidden>
-        <label class="field">
-          <span class="field-label" for="admin-password">password</span>
-          <input class="input" id="admin-password" type="password" autocomplete="current-password" data-password required>
-        </label>
-        <div>
-          <button class="btn" type="submit">masuk</button>
-        </div>
+      <div class="login" data-login hidden>
+        <a class="btn btn--github" href="/api/auth/github" data-github-login hidden>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"></path></svg>
+          Sign in with GitHub
+        </a>
+        <form class="password-form" data-password-login hidden>
+          <label class="field">
+            <span class="field-label" for="admin-password">password</span>
+            <input class="input" id="admin-password" type="password" autocomplete="current-password" data-password required>
+          </label>
+          <div>
+            <button class="btn" type="submit">masuk</button>
+          </div>
+        </form>
+        <button class="text-link" type="button" data-use-password hidden>use password</button>
         <p class="status" data-login-status role="status"></p>
-      </form>
+      </div>
 
       <form class="editor" data-editor hidden>
         <section class="panel">
@@ -70,9 +76,18 @@
             <textarea class="input textarea" rows="7" maxlength="700" data-field="intro"></textarea>
           </label>
           <label class="field">
-            <span class="field-label">username github (untuk halaman /projects)</span>
-            <input class="input" data-field="github" maxlength="39" placeholder="tenzou">
+            <span class="field-label">username github (untuk repo publik)</span>
+            <input class="input" data-field="github" maxlength="39" placeholder="username">
           </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">project manual</h2>
+            <button class="btn btn--ghost btn--sm" type="button" data-add-project>+ tambah</button>
+          </div>
+          <p class="hint">Tampil di /projects bersama repo publik GitHub.</p>
+          <div class="editor-list" data-projects-editor></div>
         </section>
 
         <section class="panel">
@@ -95,6 +110,7 @@
           <button class="btn" type="submit">simpan</button>
           <button class="btn btn--ghost" type="button" data-reload>muat ulang</button>
           <button class="btn btn--ghost" type="button" data-logout>keluar</button>
+          <span class="signed-as" data-signed-as></span>
           <span class="status" data-status role="status"></span>
         </div>
       </form>

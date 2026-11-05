@@ -1,3 +1,4 @@
+import { getSession } from "../_lib/auth.js";
 import { isAuthorized, json } from "../_lib/http.js";
 
 const MAX_BODY = 60_000;
@@ -48,12 +49,23 @@ function sanitize(input) {
     })
     .filter((post) => post.title);
 
+  const projects = (Array.isArray(data.projects) ? data.projects : [])
+    .slice(0, 30)
+    .map((project) => ({
+      title: text(project && project.title, 120),
+      description: text(project && project.description, 300),
+      url: link(project && project.url, false),
+      meta: text(project && project.meta, 60),
+    }))
+    .filter((project) => project.title);
+
   return {
     name,
     intro: text(data.intro, 700),
     version: text(data.version, 40),
     github: GITHUB_USER.test(github) ? github : "",
     socials,
+    projects,
     posts,
   };
 }
@@ -74,16 +86,19 @@ export async function onRequestGet({ env }) {
 }
 
 export async function onRequestPut({ request, env }) {
-  if (!env.ADMIN_PASSWORD) {
-    return json({ ok: false, error: "ADMIN_PASSWORD belum diset di environment" }, 500);
-  }
-
   if (!env.CONTENT) {
     return json({ ok: false, error: "KV binding CONTENT belum diset" }, 500);
   }
 
-  if (!isAuthorized(request, env)) {
-    return json({ ok: false, error: "unauthorized" }, 401);
+  const session = await getSession(request, env);
+  const allowed = Boolean(session) || isAuthorized(request, env);
+
+  if (!allowed) {
+    const configured = Boolean(env.ADMIN_PASSWORD || env.SESSION_SECRET);
+    return json(
+      { ok: false, error: configured ? "unauthorized" : "admin belum dikonfigurasi" },
+      configured ? 401 : 500
+    );
   }
 
   const raw = await request.text();

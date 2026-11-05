@@ -16,6 +16,13 @@ import { fileURLToPath } from "node:url";
 
 import { onRequestGet as getContent, onRequestPut as putContent } from "./functions/api/content.js";
 import { onRequestPost as postAuth } from "./functions/api/auth.js";
+import { onRequestGet as getAuthConfig } from "./functions/api/auth/config.js";
+import {
+  onRequestGet as getAuthSession,
+  onRequestDelete as deleteAuthSession,
+} from "./functions/api/auth/session.js";
+import { onRequestGet as getGithubStart } from "./functions/api/auth/github.js";
+import { onRequestGet as getGithubCallback } from "./functions/api/auth/callback.js";
 import { onRequestGet as getWhere } from "./functions/api/where.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
@@ -44,7 +51,16 @@ const kv = {
   },
 };
 
-const env = { CONTENT: kv, ADMIN_PASSWORD: password };
+const env = {
+  CONTENT: kv,
+  ADMIN_PASSWORD: password,
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || "",
+  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || "",
+  GITHUB_OWNER: process.env.GITHUB_OWNER || "",
+  GITHUB_ALLOWED_USERS: process.env.GITHUB_ALLOWED_USERS || "",
+  SESSION_SECRET: process.env.SESSION_SECRET || "",
+  OAUTH_CALLBACK_URL: process.env.OAUTH_CALLBACK_URL || "",
+};
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -123,6 +139,21 @@ const server = createServer(async (req, res) => {
       }
       if (pathname === "/api/auth" && req.method === "POST") {
         return proxy(res, await postAuth(context));
+      }
+      if (pathname === "/api/auth/config") {
+        return proxy(res, await getAuthConfig(context));
+      }
+      if (pathname === "/api/auth/session") {
+        return proxy(
+          res,
+          req.method === "DELETE" ? await deleteAuthSession(context) : await getAuthSession(context)
+        );
+      }
+      if (pathname === "/api/auth/github") {
+        return proxy(res, await getGithubStart(context));
+      }
+      if (pathname === "/api/auth/callback") {
+        return proxy(res, await getGithubCallback(context));
       }
       if (pathname === "/api/where") {
         return proxy(res, await getWhere(context));
