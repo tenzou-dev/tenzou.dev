@@ -7,13 +7,15 @@ lewat Pages Functions. Tanpa framework, tanpa build step.
 tenzou-dev/
 ├─ index.html            # home
 ├─ projects.html         # /projects  (project manual + repo GitHub)
-├─ blog.html             # /blog
+├─ blog.html             # /blog       (daftar artikel)
+├─ post.html             # /post.html?slug=... (artikel, like, komentar)
 ├─ admin.html            # /admin     (login GitHub)
 ├─ content.json          # default content (dipakai kalau KV masih kosong)
 ├─ assets/
 │  ├─ style.css
 │  ├─ theme.js           # tema + toast
 │  ├─ site.js            # render halaman publik
+│  ├─ post.js            # render artikel + like/komentar
 │  └─ admin.js           # editor konten
 ├─ functions/
 │  ├─ _lib/
@@ -26,6 +28,7 @@ tenzou-dev/
 │     │  ├─ github.js    # GET /api/auth/github
 │     │  ├─ callback.js  # GET /api/auth/callback
 │     │  └─ session.js   # GET / DELETE /api/auth/session
+│     ├─ blog.js         # GET /api/blog + POST like/komentar
 │     ├─ content.js      # GET / PUT /api/content
 │     ├─ status.js       # GET /api/status (versi commit + uptime)
 │     └─ where.js        # GET /api/where (lokasi pengunjung via request.cf)
@@ -104,6 +107,17 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   1. **Project manual** dari `/admin` — untuk karya yang tidak ada di GitHub.
   2. **Repo publik** dari GitHub API (`/users/<username>/repos?type=owner`).
   Repo internal instansi tidak pernah ikut. Hasil GitHub di-cache 10 menit.
+- **Blog**: setiap tulisan punya `title`, `date`, `summary`, `tags`, `body`, dan
+  `slug` yang dibuat dari judul (bisa diubah lewat data tersimpan). Daftar di
+  `/blog` menampilkan tanggal, estimasi waktu baca, ringkasan, dan tag. Membuka
+  satu tulisan mengarah ke `/post.html?slug=<slug>`, yang merender isi Markdown
+  sederhana: heading (`##`, `###`), list, code fence, blockquote, **bold**,
+  *italic*, inline `code`, dan link `http(s)`.
+- **Like & komentar**: disimpan terpisah dari konten di KV `blog:<slug>` lewat
+  `GET/POST /api/blog`, jadi menyimpan ulang tulisan di `/admin` tidak menghapus
+  like atau komentar. Like adalah hitungan per artikel; status "sudah like"
+  disimpan di `localStorage` browser. Komentar butuh nama + isi, dibatasi 1000
+  karakter, dan memakai field honeypot tersembunyi untuk menolak bot sederhana.
 - **Login**: GitHub OAuth (`/api/auth/github` → `/api/auth/callback`). Hanya
   `GITHUB_OWNER` (dan `GITHUB_ALLOWED_USERS`) yang boleh masuk. Session berupa
   cookie HttpOnly bertanda tangan `SESSION_SECRET`, berlaku 7 hari.
@@ -122,6 +136,7 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 | Hal | Di mana |
 | --- | --- |
 | Nama, intro, username GitHub, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
+| Artikel + tag | `/admin` → bagian **tulisan** (tag dipisah koma) |
 | Project manual (di luar GitHub) | `/admin` → bagian **project manual** |
 | Link sosial | `/admin` → bagian **sosial** |
 | Username GitHub | `/admin` → "username github" |
@@ -165,6 +180,7 @@ untuk `/api/auth/*` kalau mau ekstra.
 - `/api/auth/callback` → `functions/api/auth/callback.js`
 - `/api/auth/session` → `functions/api/auth/session.js`
 - `/api/content` → `functions/api/content.js`
+- `/api/blog` → `functions/api/blog.js`
 - `/api/status` → `functions/api/status.js`
 - `/api/where` → `functions/api/where.js`
 

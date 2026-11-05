@@ -25,6 +25,7 @@ import { onRequestGet as getGithubStart } from "./functions/api/auth/github.js";
 import { onRequestGet as getGithubCallback } from "./functions/api/auth/callback.js";
 import { onRequestGet as getWhere } from "./functions/api/where.js";
 import { onRequestGet as getStatus } from "./functions/api/status.js";
+import { onRequestGet as getBlog, onRequestPost as postBlog } from "./functions/api/blog.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -162,6 +163,9 @@ const server = createServer(async (req, res) => {
       }
       if (pathname === "/api/status") {
         return proxy(res, await getStatus(context));
+      }
+      if (pathname === "/api/blog") {
+        return proxy(res, req.method === "POST" ? await postBlog(context) : await getBlog(context));
       }
 
       return send(res, 404, JSON.stringify({ ok: false, error: "not found" }), {

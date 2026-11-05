@@ -235,6 +235,33 @@
     return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
 
+  function slugify(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80);
+  }
+
+  function postTags(value) {
+    const list = Array.isArray(value) ? value : String(value || "").split(",");
+    return list
+      .map((tag) => String(tag || "").trim().replace(/^#+/, ""))
+      .filter(Boolean)
+      .slice(0, 6);
+  }
+
+  function readingTime(body) {
+    const words = String(body || "")
+      .replace(/[#>*`[\]-]/g, " ")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }
+
   function renderHome(content) {
     const nameEl = $("[data-name]");
     if (nameEl) renderName(nameEl, content.name);
@@ -264,20 +291,10 @@
     posts.forEach((post) => {
       const li = document.createElement("li");
       const link = document.createElement("a");
-      const url = safeUrl(post.url, false);
+      const slug = String(post.slug || "").trim() || slugify(post.title);
 
       link.className = "row";
-
-      if (url) {
-        link.href = url;
-        if (/^https?:/i.test(url)) {
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-        }
-      } else {
-        link.href = "#";
-        link.dataset.soon = "Masih ditulis — segera hadir.";
-      }
+      link.href = "post.html?slug=" + encodeURIComponent(slug);
 
       const title = document.createElement("span");
       title.className = "row-title";
@@ -285,7 +302,7 @@
 
       const meta = document.createElement("span");
       meta.className = "row-meta";
-      meta.textContent = formatDate(post.date);
+      meta.textContent = formatDate(post.date) + (post.body ? " · " + readingTime(post.body) + " min" : "");
 
       const arrow = document.createElement("span");
       arrow.className = "row-arrow";
@@ -300,6 +317,19 @@
         desc.className = "row-desc";
         desc.textContent = post.summary;
         li.append(desc);
+      }
+
+      const tags = postTags(post.tags);
+      if (tags.length) {
+        const tagBox = document.createElement("div");
+        tagBox.className = "tags";
+        tags.forEach((tag) => {
+          const badge = document.createElement("span");
+          badge.className = "tag";
+          badge.textContent = "#" + tag;
+          tagBox.append(badge);
+        });
+        li.append(tagBox);
       }
 
       list.append(li);

@@ -176,13 +176,15 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | --- | --- |
 | `/` | Nama vertikal, intro, koordinat pengunjung, uptime berjalan, ikon sosial |
 | `/projects` | Project manual + repo publik GitHub (bukan repo internal) |
-| `/blog` | Daftar tulisan dari admin |
+| `/blog` | Daftar artikel dari admin, lengkap dengan tanggal, tag, dan waktu baca |
+| `/post.html?slug=hello-world` | Isi artikel tampil, tag muncul, tombol like dan form komentar bekerja |
+| `/api/blog?slug=hello-world` | `{"ok":true,"likes":0,"comments":[]}` |
 | `/admin` | Tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
 | Ganti tema | Tombol `light.` / `dark.` bekerja, tersimpan setelah reload |
 | `/api/content` | `{"ok":true,"content":...}` (bukan halaman HTML) |
 | `/api/auth/config` | `{"ok":true,"github":true,...}` setelah OAuth diset |
 | `/api/where` | `{"ok":true,"lat":...,"lon":...}` |
-| `/api/status` | `{"ok":true,"version":"v1.6.0-...","commits":6,...}` |
+| `/api/status` | `{"ok":true,"version":"v1.8.0-...","commits":8,...}` |
 
 ---
 
@@ -198,6 +200,8 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | **"Sesi login kedaluwarsa"** | Cookie state habis (lebih dari 10 menit) | Ulangi klik **Sign in with GitHub** |
 | Simpan gagal **"KV binding CONTENT belum diset"** | Binding salah nama atau belum ada | Tambah binding `CONTENT`, deploy ulang |
 | Simpan gagal **"Sesi habis"** | Session kedaluwarsa / `SESSION_SECRET` berubah | Login ulang |
+| Like/komentar tidak muncul | KV `CONTENT` belum ter-bind atau request `/api/blog` gagal | Cek binding `CONTENT`, buka `/api/blog?slug=<slug>` |
+| Artikel lama masih tampil | KV masih berisi daftar `posts` versi lama | Buka `/admin`, perbarui tulisan, lalu **simpan** |
 | `/projects` kosong | Username GitHub belum diisi dan belum ada project manual | Isi di `/admin` → simpan |
 | `/projects` gagal memuat repo | Rate limit GitHub (60 req/jam per IP) | Tunggu beberapa menit; hasil sukses di-cache 10 menit |
 | Baris koordinat tidak muncul | Cloudflare tidak mengirim data geo (mis. VPN) | Normal — baris memang disembunyikan |

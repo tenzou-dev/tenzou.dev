@@ -296,19 +296,21 @@
     const date = document.createElement("input");
     date.className = "input";
     date.type = "date";
-    date.value = /^\d{4}-\d{2}-\d{2}$/.test(post.date || "") ? post.date : "";
+    date.value = /^\d{4}-\d{2}-\d{2}$/.test(post.date || "")
+      ? post.date
+      : new Date().toISOString().slice(0, 10);
     date.dataset.postDate = "";
     date.setAttribute("aria-label", "tanggal");
 
-    const url = document.createElement("input");
-    url.className = "input";
-    url.type = "text";
-    url.placeholder = "url (kosongkan = coming soon)";
-    url.value = post.url || "";
-    url.dataset.postUrl = "";
-    url.setAttribute("aria-label", "url tulisan");
+    const tags = document.createElement("input");
+    tags.className = "input";
+    tags.type = "text";
+    tags.placeholder = "tag, dipisah koma (mis. web, catatan)";
+    tags.value = Array.isArray(post.tags) ? post.tags.join(", ") : post.tags || "";
+    tags.dataset.postTags = "";
+    tags.setAttribute("aria-label", "tag tulisan");
 
-    meta.append(date, url);
+    meta.append(date, tags);
 
     const summary = document.createElement("textarea");
     summary.className = "input textarea";
@@ -318,7 +320,20 @@
     summary.dataset.postSummary = "";
     summary.setAttribute("aria-label", "ringkasan");
 
-    card.append(head, meta, summary);
+    const slug = document.createElement("input");
+    slug.type = "hidden";
+    slug.value = post.slug || "";
+    slug.dataset.postSlug = "";
+
+    const body = document.createElement("textarea");
+    body.className = "input textarea";
+    body.rows = 8;
+    body.placeholder = "isi artikel — markdown sederhana: ## judul, - list, **bold**, `code`";
+    body.value = post.body || "";
+    body.dataset.postBody = "";
+    body.setAttribute("aria-label", "isi artikel");
+
+    card.append(head, meta, summary, slug, body);
     return card;
   }
 
@@ -375,9 +390,11 @@
       posts: $$("[data-post-row]", postsBox)
         .map((card) => ({
           title: $("[data-post-title]", card).value.trim(),
+          slug: $("[data-post-slug]", card).value.trim(),
           date: $("[data-post-date]", card).value,
           summary: $("[data-post-summary]", card).value.trim(),
-          url: $("[data-post-url]", card).value.trim(),
+          tags: $("[data-post-tags]", card).value.trim(),
+          body: $("[data-post-body]", card).value.trim(),
         }))
         .filter((post) => post.title),
     };

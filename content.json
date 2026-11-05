@@ -12,22 +12,44 @@
   "projects": [],
   "posts": [
     {
-      "title": "Why I still ship a single HTML file",
-      "date": "2026-10-12",
-      "summary": "No build step, no dependencies, no drama. A love letter to the boring web.",
-      "url": ""
+      "title": "Hello World !",
+      "slug": "hello-world",
+      "date": "2026-11-05",
+      "summary": "Tulisan pertama: kenapa blog ini ada, apa yang akan ditulis, dan kenapa saya lebih suka format yang sederhana.",
+      "tags": ["meta", "awal"],
+      "body": "Halo. Ini tulisan pertama di blog ini.\n\nSaya sudah lama ingin punya tempat untuk menyimpan catatan yang lebih panjang dari sekadar caption atau thread. Tempat yang tidak bergantung pada algoritma, tidak hilang karena platform berganti nama, dan bisa dibaca ulang bertahun-tahun kemudian. Jadi ya, akhirnya dibuat juga.\n\n## Kenapa blog?\n\nAda beberapa hal yang biasanya hilang kalau saya cuma menyimpannya di kepala:\n\n- langkah-langkah yang ternyata berhasil saat memperbaiki sesuatu;\n- alasan di balik keputusan teknis yang dulu terasa jelas;\n- kesalahan yang sebenarnya bisa dihindari kalau dicatat.\n\nMenulis memaksa saya untuk lebih jujur. Kalau sebuah solusi tidak bisa dijelaskan dengan bahasa sederhana, biasanya saya belum benar-benar memahaminya.\n\n## Isi blog ini\n\nSebagian besar tulisan akan tentang web, server kecil, automation, dan eksperimen tengah malam. Sesekali mungkin tentang hal non-teknis yang sedang saya pikirkan. Tidak ada jadwal tetap — saya menulis saat ada yang layak dibagikan.\n\n> Anggap ini catatan kerja, bukan majalah.\n\nKalau kamu menemukan sesuatu yang berguna di sini, itu sudah cukup. Kalau tidak, setidaknya saya punya arsip untuk diri sendiri.\n\nSelamat membaca."
     },
     {
-      "title": "Notes on running a head unit as a daily driver",
-      "date": "2026-08-03",
-      "summary": "What broke, what I replaced, and why the launcher matters more than the hardware.",
-      "url": ""
+      "title": "Kenapa saya masih pakai satu file HTML",
+      "slug": "satu-file-html",
+      "date": "2026-10-28",
+      "summary": "Tanpa build step, tanpa dependency, tanpa drama. Sedikit pembelaan untuk web yang membosankan dan cepat.",
+      "tags": ["web", "catatan"],
+      "body": "Situs ini sengaja tidak punya build step. Tidak ada bundler, tidak ada framework, tidak ada folder `dist` yang harus dihasilkan sebelum deploy. Edit file, push, selesai.\n\nKedengarannya kuno, tapi justru itu yang membuat saya bertahan.\n\n## Tiga hal yang saya jaga\n\n1. **Waktu buka cepat.** HTML dan CSS kecil, gambar sedikit, JavaScript hanya untuk bagian yang memang butuh.\n2. **Mudah diperbaiki.** Kalau ada yang rusak, saya bisa membuka file yang sama dan memperbaikinya tanpa mencari konfigurasi tersembunyi.\n3. **Tidak bergantung pada satu alat.** Tidak perlu menunggu framework besar merilis versi baru supaya situs tetap jalan.\n\nBuild step punya tempatnya. Di proyek besar, ia menyelamatkan hidup. Tapi untuk halaman seperti ini, menambahkan build step terasa seperti membangun jalan tol menuju ruang tamu.\n\n## Yang saya relakan\n\nTentu ada trade-off. Saya harus menduplikasi beberapa hal kecil, dan tidak ada hot reload yang ajaib. Tapi biaya itu jauh lebih murah dibanding waktu yang biasanya habis untuk memperbaiki tooling.\n\n> Sederhana bukan berarti malas. Sederhana berarti tahu bagian mana yang tidak perlu.\n\nKalau suatu hari situs ini tumbuh sampai butuh build step, saya akan menambahkannya. Sampai saat itu, satu file HTML sudah lebih dari cukup."
     },
     {
-      "title": "Small tools, small problems",
-      "date": "2026-05-21",
-      "summary": "The best side projects are the ones that solve exactly one annoying thing.",
-      "url": ""
+      "title": "Head unit sebagai daily driver",
+      "slug": "head-unit-daily-driver",
+      "date": "2026-09-30",
+      "summary": "Catatan setelah beberapa bulan memakai head unit Android sebagai teman harian: apa yang berguna, apa yang cuma ramai, dan widget mana yang benar-benar dipakai.",
+      "tags": ["hardware", "android", "catatan"],
+      "body": "Head unit Android di mobil sering dianggap aksesori. Setelah beberapa bulan, saya justru merasa bagian yang paling penting bukan layarnya, melainkan apa yang muncul di layar itu saat berkendara.\n\n## Yang benar-benar dipakai\n\n- peta dengan tampilan malam yang tidak menyilaukan;\n- tombol cepat ke musik dan podcast;\n- jam, kecepatan, dan informasi cuaca dalam satu pandangan;\n- launcher yang tidak berubah setiap kali perangkat menyala.\n\nSisanya — widget besar, animasi, dan halaman pengaturan yang dalam — hampir tidak pernah saya sentuh.\n\n## Pelajaran yang saya ambil\n\nPerangkat ini dipakai sambil mengemudi. Artinya, setiap elemen harus bisa dipahami dalam sekali lihat. Kalau perlu menekan dua kali untuk melakukan hal yang sering dilakukan, desainnya belum selesai.\n\nSaya juga berhenti memasang terlalu banyak aplikasi. Semakin sedikit yang berjalan di latar belakang, semakin stabil perangkatnya. Ini bukan pengaturan yang keren, tapi membuat perjalanan jauh lebih tenang.\n\n## Catatan kecil\n\nKalau kamu memakai launcher buatan sendiri, simpan versi yang paling stabil. Jangan langsung mengubah semuanya di malam sebelum perjalanan panjang. Saya belajar itu dengan cara yang tidak menyenangkan.\n\nPada akhirnya, teknologi di mobil seharusnya menghilang ke latar belakang. Kalau saya tidak ingat merek launcher-nya karena semuanya berjalan lancar, berarti desainnya berhasil."
+    },
+    {
+      "title": "Alat kecil untuk masalah kecil",
+      "slug": "alat-kecil-untuk-masalah-kecil",
+      "date": "2026-09-12",
+      "summary": "Side project terbaik biasanya tidak ambisius. Ia hanya menyelesaikan satu hal yang mengganggu, dengan cara yang cukup jelas untuk dipakai setiap hari.",
+      "tags": ["tools", "automation"],
+      "body": "Side project terbaik yang pernah saya buat tidak punya landing page, tidak punya pengguna, dan tidak pernah masuk Product Hunt. Ia hanya menghapus satu langkah kecil dari rutinitas harian.\n\n## Bentuknya sederhana\n\nSebuah script kecil yang:\n\n1. membaca satu folder;\n2. mengganti nama file sesuai tanggal;\n3. memindahkannya ke tempat yang benar;\n4. mengirim satu notifikasi kalau ada yang gagal.\n\nTidak lebih. Tapi sejak script itu ada, saya tidak lagi memikirkan pekerjaan tersebut.\n\n## Kenapa kecil itu penting\n\nAlat kecil lebih mudah dipercaya. Kita bisa membaca seluruh kodenya dalam beberapa menit, tahu apa yang dilakukannya, dan memperbaikinya tanpa takut merusak bagian lain. Ia juga lebih mudah dihentikan kalau ternyata tidak berguna.\n\nAda kalanya kita tergoda membuat platform untuk masalah yang sebenarnya bisa selesai dengan satu file. Saya pernah melakukannya. Hasilnya bukan alat yang lebih baik, hanya lebih banyak hal yang harus dirawat.\n\n> Kalau masalahnya kecil, solusinya boleh kecil.\n\nSekarang saya mencoba bertanya lebih dulu: apa langkah paling sedikit yang bisa menyelesaikan ini? Biasanya jawabannya membosankan, dan itu tanda yang bagus."
+    },
+    {
+      "title": "Debugging tengah malam: server rumahan",
+      "slug": "debugging-tengah-malam",
+      "date": "2026-08-21",
+      "summary": "Jam dua pagi, satu service mati, dan tidak ada yang bisa dihubungi. Catatan tentang log, backup, dan kebiasaan kecil yang menyelamatkan tidur.",
+      "tags": ["server", "infra", "catatan"],
+      "body": "Jam dua pagi. Satu service di server rumahan tiba-tiba tidak bisa diakses. Tidak ada tim on-call, tidak ada dashboard besar. Hanya saya, terminal, dan kopi yang sudah dingin.\n\n## Yang pertama saya lakukan\n\nSebelum mengubah apa pun, saya membaca log. Bukan semua log — hanya service yang bermasalah dan beberapa menit terakhir. Ini terdengar sepele, tapi sering menyelamatkan saya dari memperbaiki hal yang salah.\n\nUrutan yang biasanya berhasil:\n\n- cek apakah prosesnya masih berjalan;\n- lihat error terakhir di log;\n- cek ruang disk dan memori;\n- coba akses dari localhost sebelum menyalahkan jaringan;\n- baru cari perubahan konfigurasi terakhir.\n\n## Kebiasaan yang membayar dirinya sendiri\n\nBackup yang benar-benar bisa dipulihkan. Bukan backup yang hanya ada, tapi yang pernah saya coba restore. Setelah itu, perubahan konfigurasi yang dicatat singkat, dan satu halaman catatan berisi cara menyalakan ulang semuanya dari awal.\n\nSaya juga berhenti memperbaiki semuanya sekaligus. Satu perubahan, satu tes, satu kesimpulan. Kalau langsung mengubah lima hal, kita tidak akan pernah tahu mana yang menyelesaikan masalah.\n\n## Pagi berikutnya\n\nMasalahnya malam itu ternyata sederhana: sebuah service kehabisan ruang untuk menulis file sementara. Perbaikannya butuh dua menit. Yang membuatnya terasa lama adalah panik dan keinginan untuk langsung menebak.\n\nSekarang saya punya satu aturan: kalau sudah lewat tengah malam, utamakan langkah yang bisa dibatalkan. Tidur lebih penting daripada terlihat heroik."
     }
   ]
 }

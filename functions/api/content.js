@@ -1,9 +1,33 @@
 import { getSession } from "../_lib/auth.js";
 import { isAuthorized, json } from "../_lib/http.js";
 
-const MAX_BODY = 60_000;
+const MAX_BODY = 200_000;
 const SOCIAL_TYPES = new Set(["email", "github", "x", "telegram", "link"]);
 const GITHUB_USER = /^[A-Za-z0-9-]{1,39}$/;
+
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+function normalizeTags(value) {
+  const list = Array.isArray(value) ? value : String(value || "").split(",");
+  const seen = new Set();
+
+  return list
+    .map((tag) => text(tag, 24).replace(/^#+/, "").toLowerCase().replace(/\s+/g, " "))
+    .filter((tag) => {
+      if (!tag || seen.has(tag)) return false;
+      seen.add(tag);
+      return true;
+    })
+    .slice(0, 6);
+}
 
 function text(value, max) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -36,18 +60,34 @@ function sanitize(input) {
     }))
     .filter((item) => item.url);
 
+  const usedSlugs = new Set();
+
   const posts = (Array.isArray(data.posts) ? data.posts : [])
     .slice(0, 50)
     .map((post) => {
+      const title = text(post && post.title, 160);
+      if (!title) return null;
+
       const date = text(post && post.date, 10);
+      const base = slugify(post && post.slug) || slugify(title) || "post";
+      let slug = base;
+      let suffix = 2;
+      while (usedSlugs.has(slug)) {
+        slug = base + "-" + suffix;
+        suffix += 1;
+      }
+      usedSlugs.add(slug);
+
       return {
-        title: text(post && post.title, 160),
+        title,
+        slug,
         date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "",
         summary: text(post && post.summary, 400),
-        url: link(post && post.url, false),
+        tags: normalizeTags(post && post.tags),
+        body: text(post && post.body, 20000),
       };
     })
-    .filter((post) => post.title);
+    .filter(Boolean);
 
   const projects = (Array.isArray(data.projects) ? data.projects : [])
     .slice(0, 30)

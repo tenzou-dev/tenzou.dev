@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>post — tenzou.dev</title>
+  <meta name="description" content="Notes from Tenzou about code, servers and the things in between.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Crect x='13.5' y='7' width='4' height='18' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <script>
+    try {
+      var saved = localStorage.getItem("tenzou-theme");
+      if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+</head>
+<body data-page="post">
+  <div class="shell">
+    <header class="top">
+      <a class="brand" href="index.html" aria-label="tenzou.dev — home">
+        <span class="mark" aria-hidden="true"></span>
+        <span data-brand>tenzou.</span>
+      </a>
+      <nav class="top-links" aria-label="Account and appearance">
+        <a href="admin.html">sign in.</a>
+        <button class="theme" type="button" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">light.</button>
+      </nav>
+    </header>
+
+    <main class="page post-page">
+      <p class="kicker">/blog</p>
+
+      <p class="list-note" data-post-loading>memuat…</p>
+
+      <article class="post" data-post hidden>
+        <h1 class="page-title post-title" data-post-title></h1>
+        <p class="post-meta" data-post-meta></p>
+        <div class="tags" data-post-tags></div>
+        <p class="post-lead" data-post-summary hidden></p>
+        <div class="post-body" data-post-body></div>
+
+        <div class="post-actions">
+          <button class="like" type="button" data-like aria-pressed="false">
+            <span class="like-icon" data-like-icon aria-hidden="true">♡</span>
+            <span data-like-label>like</span>
+            <span class="like-count" data-like-count>0</span>
+          </button>
+          <span class="status" data-like-status role="status"></span>
+        </div>
+
+        <section class="comments" id="comments">
+          <h2 class="comments-title">komentar</h2>
+          <form class="comment-form" data-comment-form>
+            <label class="field">
+              <span class="field-label">nama</span>
+              <input class="input" type="text" maxlength="40" data-comment-name required>
+            </label>
+            <label class="field">
+              <span class="field-label">komentar</span>
+              <textarea class="input textarea" rows="4" maxlength="1000" data-comment-body required></textarea>
+            </label>
+            <div class="comment-form-foot">
+              <button class="btn" type="submit" data-comment-submit>kirim</button>
+              <span class="status" data-comment-status role="status"></span>
+            </div>
+            <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" data-comment-website>
+          </form>
+          <p class="list-note" data-comments-empty hidden>Belum ada komentar. Jadi yang pertama.</p>
+          <ul class="comments-list" data-comments></ul>
+        </section>
+      </article>
+
+      <p class="list-note" data-post-missing hidden>
+        Artikel tidak ditemukan. <a class="inline-link" href="blog.html">Kembali ke blog.</a>
+      </p>
+
+      <a class="back" href="blog.html">← all posts</a>
+    </main>
+
+    <footer class="foot">
+      <div class="foot-links">
+        <span class="mark" aria-hidden="true"></span>
+        <a href="projects.html">/projects</a>
+        <a href="blog.html">/blog</a>
+      </div>
+      <span class="version" data-version>v1.2.0-9f2c1ab</span>
+    </footer>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+  <script src="assets/theme.js"></script>
+  <script src="assets/site.js"></script>
+  <script src="assets/post.js"></script>
+</body>
+</html>
