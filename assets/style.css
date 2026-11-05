@@ -23,7 +23,7 @@
   --ok: #6ee7a8;
   --err: #ff8080;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --pad-x: clamp(24px, 7vw, 44px);
+  --pad-x: clamp(28px, 8vw, 46px);
   --pad-y: clamp(18px, 3.5vh, 30px);
   color-scheme: dark;
 }
@@ -168,7 +168,7 @@ a {
 .hero {
   display: flex;
   align-items: center;
-  gap: clamp(16px, 4.4vw, 44px);
+  gap: var(--pad-x);
   width: 100%;
   max-width: 660px;
   opacity: 0;
@@ -185,7 +185,7 @@ body.content-ready .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: clamp(32px, 9.6vw, 52px);
+  font-size: clamp(30px, 8.8vw, 50px);
   font-weight: 200;
   line-height: 1.22;
   letter-spacing: 0.01em;
@@ -857,10 +857,6 @@ body[data-page="projects"] .row-title {
 @media (max-width: 380px) {
   .top {
     font-size: 14px;
-  }
-
-  .hero {
-    gap: 14px;
   }
 
   .name {

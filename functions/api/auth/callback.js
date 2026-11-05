@@ -17,8 +17,10 @@ function redirect(request, location, cookies = []) {
   return new Response(null, { status: 302, headers });
 }
 
-function fail(request, reason) {
-  return redirect(request, "/admin?error=" + encodeURIComponent(reason));
+function fail(request, reason, login = "") {
+  let location = "/admin?error=" + encodeURIComponent(reason);
+  if (login) location += "&as=" + encodeURIComponent(login);
+  return redirect(request, location);
 }
 
 export async function onRequestGet({ request, env }) {
@@ -65,7 +67,7 @@ export async function onRequestGet({ request, env }) {
     if (!userResponse.ok) return fail(request, "token");
 
     const user = await userResponse.json();
-    if (!user || !isOwner(user.login, env)) return fail(request, "owner");
+    if (!user || !isOwner(user.login, env)) return fail(request, "owner", user && user.login);
 
     const session = await createSession(user.login, env);
     return redirect(request, "/admin", [sessionCookie(request, session)]);

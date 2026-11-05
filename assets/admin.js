@@ -105,13 +105,17 @@
   }
 
   function currentError() {
-    const error = new URLSearchParams(location.search).get("error");
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error");
     if (!error) return "";
 
+    const rejected = params.get("as") || "";
     const messages = {
       state: "Sesi login kedaluwarsa. Coba lagi.",
       token: "GitHub menolak login. Coba lagi.",
-      owner: "Akun GitHub ini tidak punya akses.",
+      owner: rejected
+        ? "Akun GitHub @" + rejected + " tidak punya akses. Klik logo GitHub untuk pilih akun lain."
+        : "Akun GitHub ini tidak punya akses. Klik logo GitHub untuk pilih akun lain.",
       config: "Login GitHub belum dikonfigurasi.",
     };
 

@@ -12,6 +12,9 @@ export async function onRequestGet({ request, env }) {
   target.searchParams.set("redirect_uri", callbackUrl(request, env));
   target.searchParams.set("scope", "read:user");
   target.searchParams.set("state", state);
+  // Always show the account picker so a failed login can be retried with
+  // another GitHub account without signing out of GitHub first.
+  target.searchParams.set("prompt", "select_account");
 
   const headers = new Headers();
   headers.set("location", target.toString());
