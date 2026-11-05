@@ -88,7 +88,7 @@
       el.textContent = name ? name + "." : ".";
     });
     $$("[data-version]").forEach((el) => {
-      el.textContent = content.version || "";
+      if (content.version) el.textContent = content.version;
     });
   }
 
@@ -142,6 +142,47 @@
     });
 
     container.hidden = container.children.length === 0;
+  }
+
+  async function loadStatus() {
+    try {
+      const res = await fetch("/api/status", {
+        headers: { accept: "application/json" },
+        cache: "no-store",
+      });
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      return data && data.ok ? data : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function startUptime(el, since) {
+    if (!el) return;
+
+    const started = Date.parse(since);
+    if (!Number.isFinite(started)) return;
+
+    const pad = (value) => String(value).padStart(2, "0");
+
+    const tick = () => {
+      let left = Math.max(0, Math.floor((Date.now() - started) / 1000));
+      const days = Math.floor(left / 86400);
+      left %= 86400;
+      const hours = Math.floor(left / 3600);
+      left %= 3600;
+      const minutes = Math.floor(left / 60);
+      const seconds = left % 60;
+
+      el.textContent =
+        "online " + days + "d " + pad(hours) + "h " + pad(minutes) + "m " + pad(seconds) + "s";
+      el.hidden = false;
+    };
+
+    tick();
+    setInterval(tick, 1000);
   }
 
   async function renderWhere(el) {
@@ -487,14 +528,27 @@
       .finally(() => clearTimeout(timer));
   }
 
-  loadContent().then((content) => {
-    if (!content || typeof content !== "object") return;
-    fillChrome(content);
+  Promise.all([loadContent(), loadStatus()]).then(([content, status]) => {
+    if (content && typeof content === "object") {
+      fillChrome(content);
 
-    if (page === "home") renderHome(content);
-    else if (page === "blog") renderPosts(content);
-    else if (page === "projects") renderProjects(content);
+      if (page === "home") renderHome(content);
+      else if (page === "blog") renderPosts(content);
+      else if (page === "projects") renderProjects(content);
 
-    document.body.classList.add("content-ready");
+      document.body.classList.add("content-ready");
+    }
+
+    if (!status) return;
+
+    if (status.version) {
+      $$("[data-version]").forEach((el) => {
+        el.textContent = status.version;
+      });
+    }
+
+    if (page === "home" && status.since) {
+      startUptime($("[data-uptime]"), status.since);
+    }
   });
 })();

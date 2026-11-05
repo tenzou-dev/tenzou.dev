@@ -24,6 +24,7 @@ import {
 import { onRequestGet as getGithubStart } from "./functions/api/auth/github.js";
 import { onRequestGet as getGithubCallback } from "./functions/api/auth/callback.js";
 import { onRequestGet as getWhere } from "./functions/api/where.js";
+import { onRequestGet as getStatus } from "./functions/api/status.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -60,6 +61,7 @@ const env = {
   GITHUB_ALLOWED_USERS: process.env.GITHUB_ALLOWED_USERS || "",
   SESSION_SECRET: process.env.SESSION_SECRET || "",
   OAUTH_CALLBACK_URL: process.env.OAUTH_CALLBACK_URL || "",
+  CF_PAGES_COMMIT_SHA: process.env.CF_PAGES_COMMIT_SHA || "",
 };
 
 const MIME = {
@@ -157,6 +159,9 @@ const server = createServer(async (req, res) => {
       }
       if (pathname === "/api/where") {
         return proxy(res, await getWhere(context));
+      }
+      if (pathname === "/api/status") {
+        return proxy(res, await getStatus(context));
       }
 
       return send(res, 404, JSON.stringify({ ok: false, error: "not found" }), {

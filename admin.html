@@ -63,16 +63,12 @@
       <form class="editor" data-editor hidden>
         <section class="panel">
           <h2 class="panel-title">profil</h2>
-          <div class="grid-2">
-            <label class="field">
-              <span class="field-label">nama (maks 12, tampil vertikal)</span>
-              <input class="input" data-field="name" maxlength="12" required>
-            </label>
-            <label class="field">
-              <span class="field-label">versi di footer</span>
-              <input class="input" data-field="version" maxlength="40" placeholder="v1.2.0-9f2c1ab">
-            </label>
-          </div>
+          <p class="hint">Versi di footer otomatis mengikuti commit terbaru.</p>
+          <label class="field">
+            <span class="field-label">nama (maks 12, tampil vertikal)</span>
+            <input class="input" data-field="name" maxlength="12" required>
+          </label>
+          <input type="hidden" data-field="version">
           <label class="field">
             <span class="field-label">intro</span>
             <textarea class="input textarea" rows="7" maxlength="700" data-field="intro"></textarea>
