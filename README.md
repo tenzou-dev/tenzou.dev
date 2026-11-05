@@ -27,6 +27,7 @@ tenzou-dev/
 │     │  ├─ callback.js  # GET /api/auth/callback
 │     │  └─ session.js   # GET / DELETE /api/auth/session
 │     ├─ content.js      # GET / PUT /api/content
+│     ├─ status.js       # GET /api/status (versi commit + uptime)
 │     └─ where.js        # GET /api/where (lokasi pengunjung via request.cf)
 ├─ dev-server.mjs        # server lokal (menjalankan Functions yang sama)
 ├─ DEPLOY.md             # panduan deploy Cloudflare (mulai dari sini)
@@ -109,13 +110,18 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Koordinat**: `GET /api/where` membaca `request.cf.latitude/longitude` (data geo Cloudflare).
   Tidak ada GPS prompt, tidak ada request ke pihak ketiga, dan tidak disimpan.
   Saat lokal, dev-server mengirim koordinat contoh.
+- **Versi footer**: `GET /api/status` membaca `CF_PAGES_COMMIT_SHA`, menghitung commit
+  lewat GitHub API, lalu menampilkan `v1.<jumlah commit>.0-<short sha>`. Hasilnya
+  di-cache di KV (`site:status`), jadi tidak memanggil GitHub di setiap request.
+- **Uptime**: baris `online ...` di bawah koordinat dihitung dari tanggal repo dibuat
+  dan berdetak tiap detik di browser.
 - **Tema**: `localStorage` (`tenzou-theme`), tombol `light.` / `dark.`, shortcut `t`.
 
 ## Yang perlu diganti
 
 | Hal | Di mana |
 | --- | --- |
-| Nama, intro, versi, username GitHub, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
+| Nama, intro, username GitHub, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
 | Project manual (di luar GitHub) | `/admin` → bagian **project manual** |
 | Link sosial | `/admin` → bagian **sosial** |
 | Username GitHub | `/admin` → "username github" |
@@ -159,6 +165,7 @@ untuk `/api/auth/*` kalau mau ekstra.
 - `/api/auth/callback` → `functions/api/auth/callback.js`
 - `/api/auth/session` → `functions/api/auth/session.js`
 - `/api/content` → `functions/api/content.js`
+- `/api/status` → `functions/api/status.js`
 - `/api/where` → `functions/api/where.js`
 
 File di dalam `functions/_lib/` tidak menjadi route, hanya dipakai untuk import.

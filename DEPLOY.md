@@ -162,7 +162,8 @@ Buka `https://<project>.pages.dev/admin` (atau `https://tenzou.dev/admin`).
 1. Klik **Sign in with GitHub**. Hanya akun `GITHUB_OWNER` yang diterima.
 2. Isi **username github** — halaman `/projects` mengambil repo publik dari username ini.
 3. Tambah **project manual** untuk karya yang tidak ada di repo GitHub.
-4. Periksa nama, intro, versi footer, dan link sosial. Ganti yang masih contoh.
+4. Periksa nama, intro, dan link sosial. Ganti yang masih contoh. Versi footer
+   otomatis mengikuti commit terbaru, jadi tidak perlu diisi.
 5. **Simpan**.
 
 Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama KV kosong.
@@ -173,7 +174,7 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 
 | Cek | Harusnya |
 | --- | --- |
-| `/` | Nama vertikal, intro, koordinat pengunjung, ikon sosial |
+| `/` | Nama vertikal, intro, koordinat pengunjung, uptime berjalan, ikon sosial |
 | `/projects` | Project manual + repo publik GitHub (bukan repo internal) |
 | `/blog` | Daftar tulisan dari admin |
 | `/admin` | Tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
@@ -181,6 +182,7 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | `/api/content` | `{"ok":true,"content":...}` (bukan halaman HTML) |
 | `/api/auth/config` | `{"ok":true,"github":true,...}` setelah OAuth diset |
 | `/api/where` | `{"ok":true,"lat":...,"lon":...}` |
+| `/api/status` | `{"ok":true,"version":"v1.6.0-...","commits":6,...}` |
 
 ---
 
