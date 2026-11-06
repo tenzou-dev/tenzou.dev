@@ -17,6 +17,9 @@
   const postsBox = $("[data-posts-editor]");
   const signedAs = $("[data-signed-as]");
   const adminTitle = $("[data-admin-title]");
+  const tabButtons = $$("[data-admin-tab]");
+  const tabPanels = $$("[data-tab-panel]");
+  const TAB_KEY = "tenzou-admin-tab";
 
   const SOCIAL_TYPES = [
     ["email", "email"],
@@ -55,6 +58,149 @@
 
   function setTitle(text) {
     if (adminTitle) adminTitle.textContent = text;
+  }
+
+  function activateTab(name) {
+    const valid = tabButtons.some((button) => button.dataset.adminTab === name);
+    const active = valid ? name : "profile";
+
+    tabButtons.forEach((button) => {
+      const selected = button.dataset.adminTab === active;
+      button.classList.toggle("is-active", selected);
+      button.setAttribute("aria-selected", selected ? "true" : "false");
+      button.tabIndex = selected ? 0 : -1;
+    });
+
+    tabPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.tabPanel !== active;
+    });
+
+    try {
+      localStorage.setItem(TAB_KEY, active);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => activateTab(button.dataset.adminTab));
+  });
+
+  let cardSeq = 0;
+
+  function editorCard(kind, label, note) {
+    const card = document.createElement("div");
+    card.className = "editor-card";
+    card.dataset[kind] = "";
+
+    const head = document.createElement("div");
+    head.className = "editor-card-head";
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "editor-card-toggle";
+    toggle.setAttribute("aria-expanded", "false");
+
+    const caret = document.createElement("span");
+    caret.className = "editor-card-caret";
+    caret.setAttribute("aria-hidden", "true");
+    caret.textContent = "▸";
+
+    const name = document.createElement("span");
+    name.className = "editor-card-name";
+    name.textContent = label;
+
+    const noteEl = document.createElement("span");
+    noteEl.className = "editor-card-note";
+    noteEl.textContent = note || "";
+
+    toggle.append(caret, name, noteEl);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "icon-btn";
+    remove.setAttribute("aria-label", "hapus");
+    remove.textContent = "×";
+    remove.addEventListener("click", () => card.remove());
+
+    const body = document.createElement("div");
+    body.className = "editor-card-body";
+    body.id = "editor-card-" + (++cardSeq);
+    body.hidden = true;
+    toggle.setAttribute("aria-controls", body.id);
+
+    head.append(toggle, remove);
+    card.append(head, body);
+
+    const setOpen = (open) => {
+      body.hidden = !open;
+      card.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      caret.textContent = open ? "▾" : "▸";
+    };
+
+    toggle.addEventListener("click", () => setOpen(body.hidden));
+
+    return { card, body, name, note: noteEl, toggle, setOpen };
+  }
+
+  async function detectStack(card, force = false) {
+    const urlInput = $("[data-project-url]", card);
+    const stackInput = $("[data-project-stack]", card);
+    const status = $("[data-project-detect]", card);
+    if (!urlInput || !stackInput) return;
+
+    const url = urlInput.value.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      setStatus(status, "");
+      return;
+    }
+
+    if (!force && stackInput.value.trim() && stackInput.dataset.auto !== "1") return;
+
+    setStatus(status, "menganalisa…");
+
+    try {
+      const headers = { accept: "application/json" };
+      if (mode === "password") headers.authorization = "Bearer " + token();
+
+      const res = await fetch("/api/project-meta?url=" + encodeURIComponent(url), {
+        headers,
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+
+      if (res.status === 401) throw new Error("login");
+      const data = await res.json().catch(() => null);
+
+      if (data && data.ok && data.stack) {
+        if (force || !stackInput.value.trim() || stackInput.dataset.auto === "1") {
+          stackInput.value = data.stack;
+          stackInput.dataset.auto = "1";
+        }
+        setStatus(status, "terdeteksi otomatis", "ok");
+      } else {
+        setStatus(status, "tidak terdeteksi · isi manual", "err");
+      }
+    } catch (e) {
+      setStatus(
+        status,
+        e && e.message === "login" ? "login ulang, lalu coba lagi" : "gagal mendeteksi · isi manual",
+        "err"
+      );
+    }
+  }
+
+  function autoDetectProjects() {
+    const cards = $$("[data-project-row]", projectsBox)
+      .filter((card) => {
+        const url = $("[data-project-url]", card).value.trim();
+        const stack = $("[data-project-stack]", card).value.trim();
+        return /^https?:\/\//i.test(url) && !stack;
+      })
+      .slice(0, 6);
+
+    cards.reduce((previous, card) => previous.then(() => detectStack(card)), Promise.resolve());
   }
 
   async function checkAuth(password) {
@@ -207,12 +353,8 @@
 
   function projectRow(item) {
     const project = item || {};
-    const card = document.createElement("div");
-    card.className = "editor-card";
-    card.dataset.projectRow = "";
-
-    const head = document.createElement("div");
-    head.className = "editor-card-head";
+    const ui = editorCard("projectRow", project.title || "project baru", project.meta || "");
+    const { card, body } = ui;
 
     const title = document.createElement("input");
     title.className = "input";
@@ -222,14 +364,10 @@
     title.dataset.projectTitle = "";
     title.setAttribute("aria-label", "nama project");
 
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.className = "icon-btn";
-    remove.setAttribute("aria-label", "hapus project");
-    remove.textContent = "×";
-    remove.addEventListener("click", () => card.remove());
-
-    head.append(title, remove);
+    const preview = () => {
+      ui.name.textContent = title.value.trim() || "project baru";
+    };
+    title.addEventListener("input", preview);
 
     const meta = document.createElement("div");
     meta.className = "editor-card-meta";
@@ -252,6 +390,33 @@
 
     meta.append(label, url);
 
+    const stackRow = document.createElement("div");
+    stackRow.className = "project-stack";
+
+    const stack = document.createElement("input");
+    stack.className = "input";
+    stack.type = "text";
+    stack.placeholder = "bahasa / stack — terisi otomatis dari link";
+    stack.value = project.stack || "";
+    stack.dataset.projectStack = "";
+    stack.setAttribute("aria-label", "bahasa atau stack project");
+    stack.addEventListener("input", () => {
+      stack.dataset.auto = "";
+    });
+
+    const detect = document.createElement("button");
+    detect.type = "button";
+    detect.className = "btn btn--ghost btn--sm";
+    detect.textContent = "deteksi";
+    detect.addEventListener("click", () => detectStack(card, true));
+
+    const detectStatus = document.createElement("span");
+    detectStatus.className = "status";
+    detectStatus.dataset.projectDetect = "";
+    detectStatus.setAttribute("role", "status");
+
+    stackRow.append(stack, detect, detectStatus);
+
     const description = document.createElement("textarea");
     description.className = "input textarea";
     description.rows = 2;
@@ -260,18 +425,33 @@
     description.dataset.projectDescription = "";
     description.setAttribute("aria-label", "deskripsi project");
 
-    card.append(head, meta, description);
+    const note = () => {
+      ui.note.textContent = label.value.trim();
+    };
+    url.addEventListener("change", () => {
+      stack.dataset.auto = "";
+      detectStack(card, true);
+    });
+    label.addEventListener("input", note);
+
+    ui.toggle.addEventListener("click", () => {
+      if (!body.hidden) detectStack(card);
+    });
+
+    body.append(title, meta, stackRow, description);
+
+    if (!project.title) {
+      ui.setOpen(true);
+      queueMicrotask(() => title.focus());
+    }
+
     return card;
   }
 
   function postRow(item) {
     const post = item || {};
-    const card = document.createElement("div");
-    card.className = "editor-card";
-    card.dataset.postRow = "";
-
-    const head = document.createElement("div");
-    head.className = "editor-card-head";
+    const ui = editorCard("postRow", post.title || "tulisan baru", post.date || "tanpa tanggal");
+    const { card, body } = ui;
 
     const title = document.createElement("input");
     title.className = "input";
@@ -280,15 +460,9 @@
     title.value = post.title || "";
     title.dataset.postTitle = "";
     title.setAttribute("aria-label", "judul");
-
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.className = "icon-btn";
-    remove.setAttribute("aria-label", "hapus tulisan");
-    remove.textContent = "×";
-    remove.addEventListener("click", () => card.remove());
-
-    head.append(title, remove);
+    title.addEventListener("input", () => {
+      ui.name.textContent = title.value.trim() || "tulisan baru";
+    });
 
     const meta = document.createElement("div");
     meta.className = "editor-card-meta";
@@ -301,6 +475,9 @@
       : new Date().toISOString().slice(0, 10);
     date.dataset.postDate = "";
     date.setAttribute("aria-label", "tanggal");
+    date.addEventListener("change", () => {
+      ui.note.textContent = date.value || "tanpa tanggal";
+    });
 
     const tags = document.createElement("input");
     tags.className = "input";
@@ -325,15 +502,21 @@
     slug.value = post.slug || "";
     slug.dataset.postSlug = "";
 
-    const body = document.createElement("textarea");
-    body.className = "input textarea";
-    body.rows = 8;
-    body.placeholder = "isi artikel — markdown sederhana: ## judul, - list, **bold**, `code`";
-    body.value = post.body || "";
-    body.dataset.postBody = "";
-    body.setAttribute("aria-label", "isi artikel");
+    const bodyInput = document.createElement("textarea");
+    bodyInput.className = "input textarea";
+    bodyInput.rows = 8;
+    bodyInput.placeholder = "isi artikel — markdown sederhana: ## judul, - list, **bold**, `code`";
+    bodyInput.value = post.body || "";
+    bodyInput.dataset.postBody = "";
+    bodyInput.setAttribute("aria-label", "isi artikel");
 
-    card.append(head, meta, summary, slug, body);
+    body.append(title, meta, summary, slug, bodyInput);
+
+    if (!post.title) {
+      ui.setOpen(true);
+      queueMicrotask(() => title.focus());
+    }
+
     return card;
   }
 
@@ -378,6 +561,7 @@
           title: $("[data-project-title]", card).value.trim(),
           meta: $("[data-project-meta]", card).value.trim(),
           url: $("[data-project-url]", card).value.trim(),
+          stack: $("[data-project-stack]", card).value.trim(),
           description: $("[data-project-description]", card).value.trim(),
         }))
         .filter((project) => project.title),
@@ -443,6 +627,16 @@
     }
 
     fillForm(content);
+
+    let savedTab = "profile";
+    try {
+      savedTab = localStorage.getItem(TAB_KEY) || "profile";
+    } catch (e) {
+      /* ignore */
+    }
+    activateTab(savedTab);
+    autoDetectProjects();
+
     setStatus(statusEl, "");
   }
 
@@ -488,6 +682,12 @@
   editorForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    if (!$('[data-field="name"]').value.trim()) {
+      activateTab("profile");
+      setStatus(statusEl, "nama wajib diisi.", "err");
+      return;
+    }
+
     const headers = { "content-type": "application/json" };
 
     if (mode === "password") {
@@ -532,6 +732,7 @@
   });
 
   $("[data-add-project]").addEventListener("click", () => {
+    activateTab("projects");
     projectsBox.append(projectRow({}));
     const cards = $$("[data-project-row]", projectsBox);
     if (cards.length) $("[data-project-title]", cards[cards.length - 1]).focus();
@@ -544,6 +745,7 @@
   });
 
   $("[data-add-post]").addEventListener("click", () => {
+    activateTab("posts");
     postsBox.append(postRow({}));
     const cards = $$("[data-post-row]", postsBox);
     if (cards.length) $("[data-post-title]", cards[cards.length - 1]).focus();

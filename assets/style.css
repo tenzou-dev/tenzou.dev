@@ -700,6 +700,41 @@ body[data-page="blog"] .row-title {
   max-width: calc(720px + var(--pad-x) * 2);
 }
 
+.admin-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.admin-tab {
+  appearance: none;
+  min-width: 0;
+  overflow: hidden;
+  padding: 7px 4px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-tab:hover {
+  color: var(--fg);
+}
+
+.admin-tab.is-active {
+  border-color: var(--hair);
+  color: var(--fg);
+}
+
 .login {
   display: flex;
   flex-direction: column;
@@ -944,6 +979,7 @@ body[data-page="blog"] .row-title {
 
 .editor-card {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   padding: 12px;
   border: 1px solid var(--hair);
@@ -954,16 +990,90 @@ body[data-page="blog"] .row-title {
   display: flex;
   gap: 10px;
   align-items: center;
+  min-width: 0;
 }
 
 .editor-card-head .input {
   flex: 1;
 }
 
+.editor-card-toggle {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 9px;
+  min-width: 0;
+  padding: 3px 0;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor-card-caret {
+  flex: none;
+  width: 12px;
+  color: var(--dim);
+  font-size: 11px;
+}
+
+.editor-card-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-card-toggle:hover .editor-card-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.editor-card-note {
+  flex: none;
+  overflow: hidden;
+  max-width: 46%;
+  margin-left: auto;
+  color: var(--dim);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-card-body {
+  display: grid;
+  gap: 10px;
+}
+
+.editor-card-body[hidden] {
+  display: none;
+}
+
 .editor-card-meta {
   display: grid;
   grid-template-columns: 170px minmax(0, 1fr);
   gap: 10px;
+}
+
+.project-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-stack .input {
+  width: 100%;
+}
+
+.project-stack .status {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
 }
 
 .icon-btn {

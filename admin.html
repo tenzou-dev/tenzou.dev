@@ -60,8 +60,15 @@
         <p class="status" data-login-status role="status"></p>
       </div>
 
-      <form class="editor" data-editor hidden>
-        <section class="panel">
+      <form class="editor" data-editor hidden novalidate>
+        <nav class="admin-tabs" role="tablist" aria-label="Bagian admin">
+          <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" data-admin-tab="profile">profil</button>
+          <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="projects">project</button>
+          <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="posts">tulisan</button>
+          <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="socials">sosial</button>
+        </nav>
+
+        <section class="panel" role="tabpanel" data-tab-panel="profile">
           <h2 class="panel-title">profil</h2>
           <p class="hint">Versi di footer otomatis mengikuti commit terbaru.</p>
           <label class="field">
@@ -79,16 +86,16 @@
           </label>
         </section>
 
-        <section class="panel">
+        <section class="panel" role="tabpanel" data-tab-panel="projects" hidden>
           <div class="panel-head">
             <h2 class="panel-title">project manual</h2>
             <button class="btn btn--ghost btn--sm" type="button" data-add-project>+ tambah</button>
           </div>
-          <p class="hint">Tampil di /projects bersama repo publik GitHub.</p>
+          <p class="hint">Tampil di /projects bersama repo publik GitHub. Bahasa/stack dideteksi otomatis dari link.</p>
           <div class="editor-list" data-projects-editor></div>
         </section>
 
-        <section class="panel">
+        <section class="panel" role="tabpanel" data-tab-panel="socials" hidden>
           <div class="panel-head">
             <h2 class="panel-title">sosial</h2>
             <button class="btn btn--ghost btn--sm" type="button" data-add-social>+ tambah</button>
@@ -96,12 +103,12 @@
           <div class="editor-list" data-socials-editor></div>
         </section>
 
-        <section class="panel">
+        <section class="panel" role="tabpanel" data-tab-panel="posts" hidden>
           <div class="panel-head">
             <h2 class="panel-title">tulisan</h2>
             <button class="btn btn--ghost btn--sm" type="button" data-add-post>+ tambah</button>
           </div>
-          <p class="hint">Tag dipisah koma. Isi artikel mendukung markdown sederhana (## judul, - list, **bold**, `code`).</p>
+          <p class="hint">Klik judul untuk membuka editor. Tag dipisah koma. Isi artikel mendukung markdown sederhana (## judul, - list, **bold**, `code`).</p>
           <div class="editor-list" data-posts-editor></div>
         </section>
 

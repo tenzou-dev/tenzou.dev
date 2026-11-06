@@ -395,19 +395,32 @@
         title.className = "row-title";
         title.textContent = String(project.title || "").trim();
 
-        const meta = document.createElement("span");
-        meta.className = "row-meta";
-        meta.textContent = String(project.meta || "").trim();
+        const side = document.createElement("span");
+        side.className = "row-side";
 
-        row.append(title, meta);
+        if (project.stack) {
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.textContent = String(project.stack).trim();
+          side.append(badge);
+        }
+
+        if (project.meta) {
+          const meta = document.createElement("span");
+          meta.className = "row-meta";
+          meta.textContent = String(project.meta).trim();
+          side.append(meta);
+        }
 
         if (url) {
           const arrow = document.createElement("span");
           arrow.className = "row-arrow";
           arrow.setAttribute("aria-hidden", "true");
           arrow.textContent = "↗";
-          row.append(arrow);
+          side.append(arrow);
         }
+
+        row.append(title, side);
 
         li.append(row);
 

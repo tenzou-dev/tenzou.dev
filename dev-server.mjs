@@ -26,6 +26,7 @@ import { onRequestGet as getGithubCallback } from "./functions/api/auth/callback
 import { onRequestGet as getWhere } from "./functions/api/where.js";
 import { onRequestGet as getStatus } from "./functions/api/status.js";
 import { onRequestGet as getBlog, onRequestPost as postBlog } from "./functions/api/blog.js";
+import { onRequestGet as getProjectMeta } from "./functions/api/project-meta.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -166,6 +167,14 @@ const server = createServer(async (req, res) => {
       }
       if (pathname === "/api/blog") {
         return proxy(res, req.method === "POST" ? await postBlog(context) : await getBlog(context));
+      }
+      if (pathname === "/api/project-meta") {
+        if (req.method !== "GET") {
+          return send(res, 405, JSON.stringify({ ok: false, error: "method" }), {
+            "content-type": "application/json; charset=utf-8",
+          });
+        }
+        return proxy(res, await getProjectMeta(context));
       }
 
       return send(res, 404, JSON.stringify({ ok: false, error: "not found" }), {

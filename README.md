@@ -30,6 +30,7 @@ tenzou-dev/
 │     │  └─ session.js   # GET / DELETE /api/auth/session
 │     ├─ blog.js         # GET /api/blog + POST like/komentar
 │     ├─ content.js      # GET / PUT /api/content
+│     ├─ project-meta.js # GET /api/project-meta (deteksi bahasa/stack)
 │     ├─ status.js       # GET /api/status (versi commit + uptime)
 │     └─ where.js        # GET /api/where (lokasi pengunjung via request.cf)
 ├─ dev-server.mjs        # server lokal (menjalankan Functions yang sama)
@@ -94,9 +95,14 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 ### Setelah deploy pertama
 
 1. Buka `/admin`, klik **Sign in with GitHub** (hanya akun `GITHUB_OWNER` yang diterima).
-2. Isi **username github** — ini yang dipakai halaman `/projects` untuk repo publik.
-3. Tambah **project manual** untuk karya yang tidak ada di GitHub.
-4. Rapikan intro, sosial, dan tulisan, lalu **simpan**.
+2. Admin dibagi menjadi empat tab: **profil**, **project**, **tulisan**, **sosial**.
+   Tab terakhir yang dibuka diingat di `localStorage`.
+3. Di tab **project** dan **tulisan**, daftar tampil sebagai judul saja. Klik judul
+   untuk membuka editornya, klik lagi untuk menutup.
+4. Isi **username github** — ini yang dipakai halaman `/projects` untuk repo publik.
+5. Tambah **project manual** untuk karya yang tidak ada di GitHub; tempel URL-nya dan
+   bahasa/stack akan dideteksi otomatis (bisa diubah manual).
+6. Rapikan intro, sosial, dan tulisan, lalu **simpan**.
 
 ## Cara kerja
 
@@ -107,6 +113,16 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   1. **Project manual** dari `/admin` — untuk karya yang tidak ada di GitHub.
   2. **Repo publik** dari GitHub API (`/users/<username>/repos?type=owner`).
   Repo internal instansi tidak pernah ikut. Hasil GitHub di-cache 10 menit.
+- **Deteksi stack**: saat URL project diisi/diubah (atau lewat tombol **deteksi**),
+  `/admin` memanggil `GET /api/project-meta?url=...`. Endpoint ini hanya untuk sesi
+  admin, menolak host privat/lokal, lalu membaca metadata: repo GitHub lewat GitHub
+  API (language + topics), situs lain dengan memeriksa HTML, header, script, dan CSS
+  untuk penanda framework (Next.js, React, Vue, WordPress, Supabase, dan seterusnya).
+  Hasilnya disimpan sebagai `stack` dan tampil sebagai badge di `/projects`; field ini
+  tetap bisa diedit manual. Kalau tidak terdeteksi, isi sendiri — tidak apa-apa.
+- **Admin**: satu halaman dengan empat tab (profil, project, tulisan, sosial). Daftar
+  project dan tulisan tampil ringkas sebagai judul; klik untuk membuka editor. Tab
+  terakhir disimpan di `localStorage` supaya tidak kembali ke atas setiap reload.
 - **Blog**: setiap tulisan punya `title`, `date`, `summary`, `tags`, `body`, dan
   `slug` yang dibuat dari judul (bisa diubah lewat data tersimpan). Daftar di
   `/blog` menampilkan tanggal, estimasi waktu baca, ringkasan, dan tag. Membuka
@@ -136,9 +152,9 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 | Hal | Di mana |
 | --- | --- |
 | Nama, intro, username GitHub, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
-| Artikel + tag | `/admin` → bagian **tulisan** (tag dipisah koma) |
-| Project manual (di luar GitHub) | `/admin` → bagian **project manual** |
-| Link sosial | `/admin` → bagian **sosial** |
+| Artikel + tag | `/admin` → tab **tulisan** (tag dipisah koma) |
+| Project manual (di luar GitHub) | `/admin` → tab **project** (stack terisi otomatis dari URL) |
+| Link sosial | `/admin` → tab **sosial** |
 | Username GitHub | `/admin` → "username github" |
 | Login GitHub | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_OWNER`, `SESSION_SECRET` |
 | Password fallback | `ADMIN_PASSWORD` (opsional) |
@@ -181,6 +197,7 @@ untuk `/api/auth/*` kalau mau ekstra.
 - `/api/auth/session` → `functions/api/auth/session.js`
 - `/api/content` → `functions/api/content.js`
 - `/api/blog` → `functions/api/blog.js`
+- `/api/project-meta` → `functions/api/project-meta.js`
 - `/api/status` → `functions/api/status.js`
 - `/api/where` → `functions/api/where.js`
 

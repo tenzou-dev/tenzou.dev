@@ -96,6 +96,7 @@ function sanitize(input) {
       description: text(project && project.description, 300),
       url: link(project && project.url, false),
       meta: text(project && project.meta, 60),
+      stack: text(project && project.stack, 80),
     }))
     .filter((project) => project.title);
 

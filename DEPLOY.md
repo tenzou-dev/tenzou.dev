@@ -160,11 +160,15 @@ npx wrangler pages deploy . --project-name tenzou-dev
 Buka `https://<project>.pages.dev/admin` (atau `https://tenzou.dev/admin`).
 
 1. Klik **Sign in with GitHub**. Hanya akun `GITHUB_OWNER` yang diterima.
-2. Isi **username github** — halaman `/projects` mengambil repo publik dari username ini.
-3. Tambah **project manual** untuk karya yang tidak ada di repo GitHub.
-4. Periksa nama, intro, dan link sosial. Ganti yang masih contoh. Versi footer
+2. Admin punya empat tab: **profil**, **project**, **tulisan**, **sosial**. Daftar
+   project/tulisan tampil sebagai judul saja — klik judul untuk membuka editor.
+3. Isi **username github** — halaman `/projects` mengambil repo publik dari username ini.
+4. Tambah **project manual** untuk karya yang tidak ada di repo GitHub. Tempel URL-nya;
+   bahasa/stack dianalisa otomatis lewat `/api/project-meta` dan tampil di `/projects`.
+   Kalau hasilnya kosong, isi manual di kolom stack.
+5. Periksa nama, intro, dan link sosial. Ganti yang masih contoh. Versi footer
    otomatis mengikuti commit terbaru, jadi tidak perlu diisi.
-5. **Simpan**.
+6. **Simpan**.
 
 Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama KV kosong.
 
@@ -179,7 +183,9 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | `/blog` | Daftar artikel dari admin, lengkap dengan tanggal, tag, dan waktu baca |
 | `/post.html?slug=hello-world` | Isi artikel tampil, tag muncul, tombol like dan form komentar bekerja |
 | `/api/blog?slug=hello-world` | `{"ok":true,"likes":0,"comments":[]}` |
-| `/admin` | Tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
+| `/admin` | Empat tab (profil/project/tulisan/sosial), tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
+| `/admin` → project | Klik judul membuka editor; URL terisi → stack terdeteksi otomatis (badge muncul di `/projects`) |
+| `/api/project-meta?url=...` | `{"ok":true,"stack":"..."}` saat login; `401` tanpa sesi |
 | Ganti tema | Tombol `light.` / `dark.` bekerja, tersimpan setelah reload |
 | `/api/content` | `{"ok":true,"content":...}` (bukan halaman HTML) |
 | `/api/auth/config` | `{"ok":true,"github":true,...}` setelah OAuth diset |
@@ -204,6 +210,8 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | Artikel lama masih tampil | KV masih berisi daftar `posts` versi lama | Buka `/admin`, perbarui tulisan, lalu **simpan** |
 | `/projects` kosong | Username GitHub belum diisi dan belum ada project manual | Isi di `/admin` → simpan |
 | `/projects` gagal memuat repo | Rate limit GitHub (60 req/jam per IP) | Tunggu beberapa menit; hasil sukses di-cache 10 menit |
+| Stack project kosong / "tidak terdeteksi" | Situs tidak mengekspos penanda framework, atau fetch diblokir | Isi kolom stack manual; deteksi hanya bantuan |
+| Tombol **deteksi** bilang "login ulang" | Sesi admin kedaluwarsa | Login ulang, lalu klik **deteksi** |
 | Baris koordinat tidak muncul | Cloudflare tidak mengirim data geo (mis. VPN) | Normal — baris memang disembunyikan |
 | Perubahan di `/admin` tidak terlihat | Browser masih memakai cache konten lama | Hard reload (Ctrl+Shift+R) |
 
@@ -225,5 +233,9 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
   OAuth tetap yang utama.
 - File development (`dev-server.mjs`, `README.md`, `DEPLOY.md`) ikut ter-upload tapi
   di-redirect ke `/` lewat `_redirects`, jadi tidak tampil sebagai halaman publik.
+- `/api/project-meta` hanya melayani sesi admin (cookie OAuth atau `ADMIN_PASSWORD`),
+  menolak skema selain http(s), host privat/lokal, dan membatasi jumlah redirect serta
+  ukuran respons. Endpoint ini tidak menyimpan apa pun — hasilnya hanya dikirim kembali
+  ke admin untuk diisi ke kolom stack.
 - Repo internal instansi tidak pernah tampil di `/projects` karena halaman hanya
   membaca repo **publik** milik username yang kamu isi.
