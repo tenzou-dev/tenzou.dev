@@ -13,7 +13,7 @@ tenzou-dev/
 ├─ content.json          # default content (dipakai kalau KV masih kosong)
 ├─ assets/
 │  ├─ style.css
-│  ├─ theme.js           # tema + toast
+│  ├─ theme.js           # tema, font + toast
 │  ├─ site.js            # render halaman publik
 │  ├─ post.js            # render artikel + like/komentar
 │  └─ admin.js           # editor konten
@@ -89,8 +89,11 @@ Ringkasnya:
 Selama KV masih kosong, situs memakai `content.json` apa adanya. Setelah kamu
 menekan **simpan** di `/admin`, isi KV yang dipakai.
 
-> Kalau nanti pindah ke `tenzou.dev`, ubah **Authorization callback URL** di OAuth App
-> menjadi `https://tenzou.dev/api/auth/callback`, atau set `OAUTH_CALLBACK_URL`.
+> Domain `tenzou.dev` sudah aktif dan dipakai sebagai alamat utama. Pastikan
+> **Authorization callback URL** di OAuth App adalah
+> `https://tenzou.dev/api/auth/callback` (atau set `OAUTH_CALLBACK_URL`), supaya
+> login GitHub tidak gagal `redirect_uri` mismatch. Alamat `*.pages.dev` tetap
+> berfungsi sebagai cadangan.
 
 ### Setelah deploy pertama
 
@@ -118,8 +121,9 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   admin, menolak host privat/lokal, lalu membaca metadata: repo GitHub lewat GitHub
   API (language + topics), situs lain dengan memeriksa HTML, header, script, dan CSS
   untuk penanda framework (Next.js, React, Vue, WordPress, Supabase, dan seterusnya).
-  Hasilnya disimpan sebagai `stack` dan tampil sebagai badge di `/projects`; field ini
-  tetap bisa diedit manual. Kalau tidak terdeteksi, isi sendiri — tidak apa-apa.
+  Hasilnya disimpan sebagai `stack` dan tampil sebagai badge di `/projects` (satu
+  badge per item, dipisah `·`); field ini tetap bisa diedit manual. Kalau tidak
+  terdeteksi, isi sendiri — tidak apa-apa.
 - **Admin**: satu halaman dengan empat tab (profil, project, tulisan, sosial). Daftar
   project dan tulisan tampil ringkas sebagai judul; klik untuk membuka editor. Tab
   terakhir disimpan di `localStorage` supaya tidak kembali ke atas setiap reload.
@@ -146,12 +150,19 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Uptime**: angka `hari.jammenitdetikratusan` (contoh `3.13542030`) di bawah
   koordinat, dihitung dari tanggal repo dibuat dan berdetak tiap frame.
 - **Tema**: `localStorage` (`tenzou-theme`), tombol `light.` / `dark.`, shortcut `t`.
+- **Font**: pilihan font tampilan disimpan di konten (`font`) dan dipilih lewat
+  `/admin` → tab **profil** → **font tampilan**. Pilihan: JetBrains Mono (default),
+  IBM Plex Mono, Space Mono, Fira Code, dan system monospace. Nilai terakhir juga
+  di-cache di `localStorage` (`tenzou-font`) supaya tidak berkedip saat reload.
+- **Header & footer**: keduanya menempel di layar (`position: sticky`) saat halaman
+  di-scroll. Header di atas, footer di bawah, dengan latar solid agar konten tidak
+  tembus.
 
 ## Yang perlu diganti
 
 | Hal | Di mana |
 | --- | --- |
-| Nama, intro, username GitHub, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
+| Nama, intro, username GitHub, font, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
 | Artikel + tag | `/admin` → tab **tulisan** (tag dipisah koma) |
 | Project manual (di luar GitHub) | `/admin` → tab **project** (stack terisi otomatis dari URL) |
 | Link sosial | `/admin` → tab **sosial** |

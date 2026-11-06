@@ -72,8 +72,10 @@ opsional untuk lokal/CLI.
 4. Catat **Client ID**, lalu **Generate a new client secret** dan catat nilainya
    (secret hanya ditampilkan sekali).
 
-> URL callback harus **persis** sama. Kalau nanti pindah ke `tenzou.dev`, ubah
-> callback menjadi `https://tenzou.dev/api/auth/callback` di OAuth App yang sama.
+> URL callback harus **persis** sama. Kalau situs dibuka lewat domain sendiri
+> (mis. `https://tenzou.dev`), callback harus `https://tenzou.dev/api/auth/callback`
+> — bukan `*.pages.dev` — atau login akan gagal `redirect_uri` mismatch.
+> `*.pages.dev` tetap bisa dipakai sebagai cadangan.
 
 #### 4b. Pasang variabel di Cloudflare
 
@@ -164,10 +166,10 @@ Buka `https://<project>.pages.dev/admin` (atau `https://tenzou.dev/admin`).
    project/tulisan tampil sebagai judul saja — klik judul untuk membuka editor.
 3. Isi **username github** — halaman `/projects` mengambil repo publik dari username ini.
 4. Tambah **project manual** untuk karya yang tidak ada di repo GitHub. Tempel URL-nya;
-   bahasa/stack dianalisa otomatis lewat `/api/project-meta` dan tampil di `/projects`.
-   Kalau hasilnya kosong, isi manual di kolom stack.
-5. Periksa nama, intro, dan link sosial. Ganti yang masih contoh. Versi footer
-   otomatis mengikuti commit terbaru, jadi tidak perlu diisi.
+   bahasa/stack dianalisa otomatis lewat `/api/project-meta` dan tampil sebagai badge
+   di bawah judul project. Kalau hasilnya kosong, isi manual di kolom stack.
+5. Periksa nama, intro, link sosial, dan **font tampilan**. Ganti yang masih contoh.
+   Versi footer otomatis mengikuti commit terbaru, jadi tidak perlu diisi.
 6. **Simpan**.
 
 Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama KV kosong.
@@ -184,7 +186,9 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | `/post.html?slug=hello-world` | Isi artikel tampil, tag muncul, tombol like dan form komentar bekerja |
 | `/api/blog?slug=hello-world` | `{"ok":true,"likes":0,"comments":[]}` |
 | `/admin` | Empat tab (profil/project/tulisan/sosial), tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
-| `/admin` → project | Klik judul membuka editor; URL terisi → stack terdeteksi otomatis (badge muncul di `/projects`) |
+| `/admin` → project | Klik judul membuka editor; URL terisi → stack terdeteksi otomatis (badge muncul di bawah judul di `/projects`) |
+| `/admin` → profil → font | Ganti font, simpan, seluruh situs memakai font baru |
+| Scroll halaman panjang | Header dan footer tetap menempel di layar |
 | `/api/project-meta?url=...` | `{"ok":true,"stack":"..."}` saat login; `401` tanpa sesi |
 | Ganti tema | Tombol `light.` / `dark.` bekerja, tersimpan setelah reload |
 | `/api/content` | `{"ok":true,"content":...}` (bukan halaman HTML) |

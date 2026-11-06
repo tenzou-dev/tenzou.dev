@@ -1,9 +1,21 @@
 /* Theme + toast shared by every page. */
 (() => {
   const THEME_KEY = "tenzou-theme";
+  const FONT_KEY = "tenzou-font";
+  const FONTS = ["jetbrains", "ibm", "space", "fira", "system"];
   const root = document.documentElement;
   const toggle = document.querySelector("[data-theme-toggle]");
   const meta = document.querySelector('meta[name="theme-color"]');
+
+  window.tzApplyFont = (name) => {
+    const font = FONTS.includes(name) ? name : "jetbrains";
+    root.dataset.font = font;
+    try {
+      localStorage.setItem(FONT_KEY, font);
+    } catch (e) {
+      /* storage blocked */
+    }
+  };
 
   function applyTheme(theme, persist) {
     root.dataset.theme = theme;

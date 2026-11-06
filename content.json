@@ -2,6 +2,7 @@
   "name": "tenzou",
   "intro": "Hi, I'm Tenzou. I build things. Sometimes I write code & the other time's I tinker with servers. I like clean interfaces, tiny automation & late-night debugging. You'll find all my projects, notes & experiments here. 🖤",
   "version": "v1.2.0-9f2c1ab",
+  "font": "jetbrains",
   "github": "",
   "socials": [
     { "type": "email", "url": "mailto:hello@tenzou.dev" },

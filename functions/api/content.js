@@ -3,6 +3,7 @@ import { isAuthorized, json } from "../_lib/http.js";
 
 const MAX_BODY = 200_000;
 const SOCIAL_TYPES = new Set(["email", "github", "x", "telegram", "link"]);
+const FONTS = new Set(["jetbrains", "ibm", "space", "fira", "system"]);
 const GITHUB_USER = /^[A-Za-z0-9-]{1,39}$/;
 
 function slugify(value) {
@@ -104,6 +105,7 @@ function sanitize(input) {
     name,
     intro: text(data.intro, 700),
     version: text(data.version, 40),
+    font: FONTS.has(data.font) ? data.font : "jetbrains",
     github: GITHUB_USER.test(github) ? github : "",
     socials,
     projects,

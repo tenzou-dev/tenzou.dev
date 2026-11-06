@@ -90,6 +90,9 @@
     $$("[data-version]").forEach((el) => {
       if (content.version) el.textContent = content.version;
     });
+    if (typeof window.tzApplyFont === "function") {
+      window.tzApplyFont(content.font);
+    }
   }
 
   function renderName(el, name) {
@@ -398,13 +401,6 @@
         const side = document.createElement("span");
         side.className = "row-side";
 
-        if (project.stack) {
-          const badge = document.createElement("span");
-          badge.className = "badge";
-          badge.textContent = String(project.stack).trim();
-          side.append(badge);
-        }
-
         if (project.meta) {
           const meta = document.createElement("span");
           meta.className = "row-meta";
@@ -420,7 +416,27 @@
           side.append(arrow);
         }
 
-        row.append(title, side);
+        const badges = document.createElement("span");
+        badges.className = "row-badges";
+
+        if (project.stack) {
+          const labels = String(project.stack)
+            .split(/\s*[·|]\s*/)
+            .map((label) => label.trim())
+            .filter(Boolean)
+            .slice(0, 8);
+
+          labels.forEach((label) => {
+            const badge = document.createElement("span");
+            badge.className = "badge";
+            badge.textContent = label;
+            badges.append(badge);
+          });
+        }
+
+        row.append(title);
+        if (side.childElementCount) row.append(side);
+        if (badges.childElementCount) row.append(badges);
 
         li.append(row);
 

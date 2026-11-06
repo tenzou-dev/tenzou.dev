@@ -545,6 +545,8 @@
     $('[data-field="version"]').value = content.version || "";
     $('[data-field="intro"]').value = content.intro || "";
     $('[data-field="github"]').value = content.github || "";
+    const fontField = $('[data-field="font"]');
+    if (fontField) fontField.value = content.font || "jetbrains";
     renderProjectRows(content.projects);
     renderSocialRows(content.socials);
     renderPostRows(content.posts);
@@ -556,6 +558,7 @@
       intro: $('[data-field="intro"]').value.trim(),
       version: $('[data-field="version"]').value.trim(),
       github: $('[data-field="github"]').value.trim(),
+      font: $('[data-field="font"]') ? $('[data-field="font"]').value : "jetbrains",
       projects: $$("[data-project-row]", projectsBox)
         .map((card) => ({
           title: $("[data-project-title]", card).value.trim(),
@@ -677,6 +680,12 @@
     passwordForm.hidden = false;
     setStatus(loginStatus, "");
     $("[data-password]").focus();
+  });
+
+  $("[data-field=\"font\"]")?.addEventListener("change", (event) => {
+    if (typeof window.tzApplyFont === "function") {
+      window.tzApplyFont(event.target.value);
+    }
   });
 
   editorForm.addEventListener("submit", async (event) => {

@@ -29,6 +29,22 @@
   color-scheme: dark;
 }
 
+html[data-font="ibm"] {
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html[data-font="space"] {
+  --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html[data-font="fira"] {
+  --mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html[data-font="system"] {
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 html[data-theme="light"] {
   --bg: #f3f1ec;
   --fg: #14140f;
@@ -99,14 +115,22 @@ a {
 /* ---------- top bar ---------- */
 
 .top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding-inline: var(--edge-x);
+  padding-block: 10px;
+  margin-block: -10px;
+  background: var(--bg);
+  box-shadow: 0 0 0 12px var(--bg);
   font-size: 15px;
   line-height: 1;
   letter-spacing: 0.01em;
+  transition: background-color 0.25s ease;
 }
 
 .top a {
@@ -259,13 +283,21 @@ body.content-ready .hero {
 /* ---------- footer ---------- */
 
 .foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding-inline: var(--edge-x);
+  padding-block: 10px;
+  margin-block: -10px;
+  background: var(--bg);
+  box-shadow: 0 0 0 12px var(--bg);
   font-size: 14px;
   line-height: 1;
+  transition: background-color 0.25s ease;
 }
 
 .foot-links {
@@ -374,7 +406,9 @@ body[data-page="projects"] .row-title {
 
 .row-side {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 9px;
   margin-left: auto;
   flex: none;
@@ -394,6 +428,14 @@ body[data-page="projects"] .row-title {
   line-height: 1.65;
   letter-spacing: 0.03em;
   white-space: nowrap;
+}
+
+.row-badges {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: -2px;
 }
 
 .row-arrow {
@@ -1162,8 +1204,8 @@ body[data-page="blog"] .row-title {
 .toast {
   position: fixed;
   left: 50%;
-  bottom: 26px;
-  z-index: 10;
+  bottom: 56px;
+  z-index: 40;
   max-width: min(88vw, 420px);
   padding: 9px 15px;
   border-radius: 999px;
