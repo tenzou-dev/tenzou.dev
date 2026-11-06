@@ -546,7 +546,12 @@
     $('[data-field="intro"]').value = content.intro || "";
     $('[data-field="github"]').value = content.github || "";
     const fontField = $('[data-field="font"]');
-    if (fontField) fontField.value = content.font || "jetbrains";
+    if (fontField) {
+      fontField.value = content.font || "jetbrains";
+      if (typeof window.tzApplyFont === "function") {
+        window.tzApplyFont(fontField.value);
+      }
+    }
     renderProjectRows(content.projects);
     renderSocialRows(content.socials);
     renderPostRows(content.posts);
@@ -682,10 +687,16 @@
     $("[data-password]").focus();
   });
 
+  let fontSaveTimer;
   $("[data-field=\"font\"]")?.addEventListener("change", (event) => {
     if (typeof window.tzApplyFont === "function") {
       window.tzApplyFont(event.target.value);
     }
+
+    clearTimeout(fontSaveTimer);
+    fontSaveTimer = setTimeout(() => {
+      if (!editorForm.hidden) editorForm.requestSubmit();
+    }, 350);
   });
 
   editorForm.addEventListener("submit", async (event) => {
@@ -731,6 +742,11 @@
         localStorage.removeItem("tenzou-content-v2");
       } catch (e) {
         /* ignore */
+      }
+
+      const fontField = $('[data-field="font"]');
+      if (fontField && typeof window.tzApplyFont === "function") {
+        window.tzApplyFont(fontField.value);
       }
 
       setStatus(statusEl, "tersimpan ✓", "ok");

@@ -187,7 +187,7 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | `/api/blog?slug=hello-world` | `{"ok":true,"likes":0,"comments":[]}` |
 | `/admin` | Empat tab (profil/project/tulisan/sosial), tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
 | `/admin` → project | Klik judul membuka editor; URL terisi → stack terdeteksi otomatis (badge muncul di bawah judul di `/projects`) |
-| `/admin` → profil → font | Ganti font, simpan, seluruh situs memakai font baru |
+| `/admin` → profil → font | Pilih font → otomatis tersimpan → seluruh situs memakai font baru setelah refresh |
 | Scroll halaman panjang | Header dan footer tetap menempel di layar |
 | `/api/project-meta?url=...` | `{"ok":true,"stack":"..."}` saat login; `401` tanpa sesi |
 | Ganti tema | Tombol `light.` / `dark.` bekerja, tersimpan setelah reload |

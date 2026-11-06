@@ -121,9 +121,10 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   admin, menolak host privat/lokal, lalu membaca metadata: repo GitHub lewat GitHub
   API (language + topics), situs lain dengan memeriksa HTML, header, script, dan CSS
   untuk penanda framework (Next.js, React, Vue, WordPress, Supabase, dan seterusnya).
-  Hasilnya disimpan sebagai `stack` dan tampil sebagai badge di `/projects` (satu
-  badge per item, dipisah `·`); field ini tetap bisa diedit manual. Kalau tidak
-  terdeteksi, isi sendiri — tidak apa-apa.
+  Hasilnya disimpan sebagai `stack` dan tampil sebagai badge **di bawah judul**
+  project (satu badge per item, dipisah `·`); field ini tetap bisa diedit manual.
+  Repo GitHub juga menampilkan bahasa di bawah judul dengan cara yang sama.
+  Kalau tidak terdeteksi, isi sendiri — tidak apa-apa.
 - **Admin**: satu halaman dengan empat tab (profil, project, tulisan, sosial). Daftar
   project dan tulisan tampil ringkas sebagai judul; klik untuk membuka editor. Tab
   terakhir disimpan di `localStorage` supaya tidak kembali ke atas setiap reload.
@@ -152,7 +153,8 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Tema**: `localStorage` (`tenzou-theme`), tombol `light.` / `dark.`, shortcut `t`.
 - **Font**: pilihan font tampilan disimpan di konten (`font`) dan dipilih lewat
   `/admin` → tab **profil** → **font tampilan**. Pilihan: JetBrains Mono (default),
-  IBM Plex Mono, Space Mono, Fira Code, dan system monospace. Nilai terakhir juga
+  IBM Plex Mono, Space Mono, Fira Code, dan system monospace. Memilih font langsung
+  menyimpan konten (jadi berlaku untuk semua pengunjung) dan nilai terakhir juga
   di-cache di `localStorage` (`tenzou-font`) supaya tidak berkedip saat reload.
 - **Header & footer**: keduanya menempel di layar (`position: sticky`) saat halaman
   di-scroll. Header di atas, footer di bawah, dengan latar solid agar konten tidak

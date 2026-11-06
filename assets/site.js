@@ -90,7 +90,7 @@
     $$("[data-version]").forEach((el) => {
       if (content.version) el.textContent = content.version;
     });
-    if (typeof window.tzApplyFont === "function") {
+    if (page !== "admin" && typeof window.tzApplyFont === "function") {
       window.tzApplyFont(content.font);
     }
   }
@@ -467,13 +467,6 @@
           const side = document.createElement("span");
           side.className = "row-side";
 
-          if (repo.language) {
-            const badge = document.createElement("span");
-            badge.className = "badge";
-            badge.textContent = repo.language;
-            side.append(badge);
-          }
-
           const metaBits = [];
           if (repo.stargazers_count > 0) metaBits.push("★ " + repo.stargazers_count);
           if (repo.archived) metaBits.push("archived");
@@ -491,7 +484,19 @@
           arrow.textContent = "↗";
           side.append(arrow);
 
-          link.append(title, side);
+          const badges = document.createElement("span");
+          badges.className = "row-badges";
+
+          if (repo.language) {
+            const badge = document.createElement("span");
+            badge.className = "badge";
+            badge.textContent = repo.language;
+            badges.append(badge);
+          }
+
+          link.append(title);
+          if (side.childElementCount) link.append(side);
+          if (badges.childElementCount) link.append(badges);
           li.append(link);
 
           if (repo.description) {
