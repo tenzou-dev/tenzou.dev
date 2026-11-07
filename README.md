@@ -3,6 +3,8 @@
 Situs pribadi + admin panel. Statis (HTML/CSS/JS), konten disimpan di Cloudflare KV
 lewat Pages Functions. Tanpa framework, tanpa build step.
 
+Repo: <https://github.com/tenzou-dev/tenzou.dev> (branch `main`).
+
 ```
 tenzou-dev/
 ├─ index.html            # home
@@ -10,6 +12,9 @@ tenzou-dev/
 ├─ blog.html             # /blog       (daftar artikel)
 ├─ post.html             # /post.html?slug=... (artikel, like, komentar)
 ├─ admin.html            # /admin     (login GitHub)
+├─ favicon.svg           # ikon TZ (utama)
+├─ favicon-32.png        # fallback PNG 32px
+├─ apple-touch-icon.png  # ikon iOS 180px
 ├─ content.json          # default content (dipakai kalau KV masih kosong)
 ├─ assets/
 │  ├─ style.css
@@ -159,6 +164,15 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Header & footer**: keduanya menempel di layar (`position: sticky`) saat halaman
   di-scroll. Header di atas, footer di bawah, dengan latar solid agar konten tidak
   tembus.
+- **Favicon**: `favicon.svg` berisi wordmark **TZ** (putih di atas hitam), dengan
+  `favicon-32.png` dan `apple-touch-icon.png` sebagai fallback. Semua halaman
+  memakai ikon yang sama.
+- **Ikon sosial**: ikon ditentukan dari URL, bukan dari pilihan tipe. Tempel link
+  Instagram/Facebook/LinkedIn/YouTube/TikTok/WhatsApp/Discord/Reddit/Pinterest/
+  Twitch/Spotify/Medium/Threads/Bluesky/GitLab/Stack Overflow/Dribbble/Behance/
+  Mastodon/dev.to dan ikon brand yang sesuai muncul otomatis. Link yang tidak
+  dikenali memakai ikon rantai (`link`). Tipe di `/admin` hanya berfungsi sebagai
+  override manual kalau diperlukan.
 
 ## Yang perlu diganti
 

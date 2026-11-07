@@ -2,7 +2,33 @@ import { getSession } from "../_lib/auth.js";
 import { isAuthorized, json } from "../_lib/http.js";
 
 const MAX_BODY = 200_000;
-const SOCIAL_TYPES = new Set(["email", "github", "x", "telegram", "link"]);
+const SOCIAL_TYPES = new Set([
+  "email",
+  "github",
+  "x",
+  "telegram",
+  "instagram",
+  "facebook",
+  "linkedin",
+  "youtube",
+  "tiktok",
+  "whatsapp",
+  "discord",
+  "reddit",
+  "pinterest",
+  "twitch",
+  "spotify",
+  "medium",
+  "threads",
+  "bluesky",
+  "gitlab",
+  "stackoverflow",
+  "dribbble",
+  "behance",
+  "mastodon",
+  "devdotto",
+  "link",
+]);
 const FONTS = new Set(["jetbrains", "ibm", "space", "fira", "system"]);
 const GITHUB_USER = /^[A-Za-z0-9-]{1,39}$/;
 

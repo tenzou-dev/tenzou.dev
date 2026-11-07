@@ -8,7 +8,7 @@ import { json } from "../_lib/http.js";
  * (v1.<commit count>.0-<short sha>) and to find when the repo went live.
  * The result is cached in KV so regular visits never touch GitHub.
  */
-const REPO = "tenzou-dev/tenzou.site";
+const REPO = "tenzou-dev/tenzou.dev";
 const CACHE_KEY = "site:status";
 const CACHE_TTL = 60 * 60 * 24 * 7;
 

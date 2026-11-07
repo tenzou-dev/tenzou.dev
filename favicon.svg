@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TZ">
+  <title>TZ</title>
+  <rect width="64" height="64" rx="12" fill="#000"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="11.25" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+  <g fill="#fff">
+    <rect x="8" y="16" width="21" height="7"/>
+    <rect x="15" y="16" width="7" height="33"/>
+    <path d="M33 16h23v7H33z"/>
+    <path d="M33 42h23v7H33z"/>
+    <path d="M50 23h6L39 42h-6z"/>
+  </g>
+</svg>

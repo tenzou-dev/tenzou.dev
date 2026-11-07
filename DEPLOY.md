@@ -3,6 +3,9 @@
 Panduan ini khusus untuk folder `tenzou-dev/`. Tidak ada build step — yang di-upload
 adalah file apa adanya, dan folder `functions/` otomatis menjadi API.
 
+Repo produksi: <https://github.com/tenzou-dev/tenzou.dev> (branch `main`).
+Push ke repo itu akan memicu deploy Cloudflare Pages.
+
 > **Penting:** jangan pakai drag-and-drop di dashboard Cloudflare Pages.
 > Upload manual hanya mengirim file statis dan **tidak** menjalankan folder `functions/`,
 > jadi `/admin` tidak akan bisa menyimpan. Pakai **Git integration** (cara A) atau
@@ -189,6 +192,8 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | `/admin` → project | Klik judul membuka editor; URL terisi → stack terdeteksi otomatis (badge muncul di bawah judul di `/projects`) |
 | `/admin` → profil → font | Pilih font → otomatis tersimpan → seluruh situs memakai font baru setelah refresh |
 | Scroll halaman panjang | Header dan footer tetap menempel di layar |
+| Tab browser | Ikon **TZ** muncul (favicon) di semua halaman |
+| `/admin` → sosial | Tempel link Instagram/Facebook → ikon brand muncul otomatis di `/`; link asing memakai ikon rantai |
 | `/api/project-meta?url=...` | `{"ok":true,"stack":"..."}` saat login; `401` tanpa sesi |
 | Ganti tema | Tombol `light.` / `dark.` bekerja, tersimpan setelah reload |
 | `/api/content` | `{"ok":true,"content":...}` (bukan halaman HTML) |
