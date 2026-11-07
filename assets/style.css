@@ -1108,10 +1108,52 @@ body[data-page="blog"] .row-title {
 }
 
 .page-title--xl {
-  font-size: clamp(42px, 9vw, 60px);
+  font-size: clamp(28px, 6vw, 40px);
   font-weight: 200;
   line-height: 1;
   letter-spacing: -0.03em;
+}
+
+/* logged-out view: center everything in the available screen space */
+
+.admin.is-signin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin.is-signin .signin-head {
+  justify-content: center;
+}
+
+.admin.is-signin .login {
+  align-items: center;
+  width: min(320px, 100%);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.admin.is-signin .login .text-link {
+  align-self: center;
+}
+
+.admin.is-signin .password-form {
+  width: 100%;
+  text-align: left;
+}
+
+.admin.is-signin .password-form > div {
+  text-align: center;
+}
+
+.admin.is-signin .status {
+  text-align: center;
+}
+
+.admin.is-signin .offline-note {
+  text-align: left;
+  margin-inline: auto;
 }
 
 .github-login {
@@ -1123,7 +1165,7 @@ body[data-page="blog"] .row-title {
 
 .github-login .signin-bar {
   color: var(--dim);
-  font-size: clamp(28px, 7vw, 38px);
+  font-size: clamp(48px, 11vw, 68px);
   font-weight: 200;
   line-height: 1;
 }
@@ -1412,7 +1454,7 @@ body[data-page="blog"] .row-title {
   }
 
   .page-title--xl {
-    font-size: 36px;
+    font-size: 26px;
   }
 
   .github-login {
@@ -1420,7 +1462,7 @@ body[data-page="blog"] .row-title {
   }
 
   .github-login .signin-bar {
-    font-size: 30px;
+    font-size: 44px;
   }
 
   .github-login svg {

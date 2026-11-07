@@ -17,6 +17,7 @@
   const postsBox = $("[data-posts-editor]");
   const signedAs = $("[data-signed-as]");
   const adminTitle = $("[data-admin-title]");
+  const adminPage = adminTitle ? adminTitle.closest("main") : null;
   const tabButtons = $$("[data-admin-tab]");
   const tabPanels = $$("[data-tab-panel]");
   const TAB_KEY = "tenzou-admin-tab";
@@ -644,6 +645,7 @@
     editorForm.hidden = true;
     loginBox.hidden = false;
     signedAs.textContent = "";
+    if (adminPage) adminPage.classList.add("is-signin");
     setTitle("Sign in.");
     setStatus(loginStatus, message || "", kind);
 
@@ -670,6 +672,7 @@
     githubLogin.hidden = true;
     editorForm.hidden = false;
     offlineEl.hidden = true;
+    if (adminPage) adminPage.classList.remove("is-signin");
     setTitle("Content.");
     signedAs.textContent = sessionLogin ? "@" + sessionLogin : "";
     setStatus(statusEl, "memuat…");
