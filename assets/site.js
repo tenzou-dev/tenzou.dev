@@ -208,6 +208,9 @@
     if (page !== "admin" && typeof window.tzApplyFont === "function") {
       window.tzApplyFont(content.font);
     }
+    if (typeof window.tzApplyBackground === "function") {
+      window.tzApplyBackground(content.background, content.backgroundOpacity);
+    }
   }
 
   function renderName(el, name) {

@@ -23,11 +23,49 @@
       if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
       var font = localStorage.getItem("tenzou-font");
       if (font) document.documentElement.dataset.font = font;
+      var bg = localStorage.getItem("tenzou-bg");
+      if (bg === "none" || bg === "code" || bg === "grid") document.documentElement.dataset.bg = bg;
+      var bgOpacity = localStorage.getItem("tenzou-bg-opacity");
+      if (bgOpacity !== null) {
+        var bgValue = Number(bgOpacity);
+        if (isFinite(bgValue)) {
+          document.documentElement.style.setProperty("--bg-art-opacity", Math.min(100, Math.max(0, bgValue)) / 100);
+        }
+      }
     } catch (e) {}
   </script>
   <noscript><style>.hero { opacity: 1 !important; }</style></noscript>
 </head>
 <body data-page="home">
+  <div class="bg-art" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-code">
+      <pre class="bg-code-left">const boot = async () =&gt; {
+  const env = await load();
+
+  if (!env.ok) return retry(3);
+
+  while (alive) {
+    build(small);
+    ship(fast);
+  }
+};
+
+$ git commit -m "fix: lagi"
+$ tail -f /var/log/life</pre>
+      <pre class="bg-code-right">GET /api/content 200
+SELECT * FROM notes
+WHERE mood = 'calm';
+
+server.listen(3000, () =&gt; {
+  log("ready.");
+});
+
+01001000 01101001
+01101110 01110100</pre>
+    </div>
+  </div>
+
   <div class="shell">
     <header class="top">
       <a class="brand" href="index.html" aria-label="tenzou.dev — home">

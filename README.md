@@ -161,6 +161,13 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   IBM Plex Mono, Space Mono, Fira Code, dan system monospace. Memilih font langsung
   menyimpan konten (jadi berlaku untuk semua pengunjung) dan nilai terakhir juga
   di-cache di `localStorage` (`tenzou-font`) supaya tidak berkedip saat reload.
+- **Background home**: halaman home punya lapisan dekoratif tipis di belakang konten.
+  Pilih gaya lewat `/admin` → tab **profil** → **background home**: `kode` (potongan
+  kode, default), `grid` (grid titik), atau `none`. Geser **opasitas background**
+  untuk mengatur seberapa tipis tampilannya (default 12%). Nilainya disimpan di
+  konten (`background`, `backgroundOpacity`) dan di-cache di `localStorage` supaya
+  tidak berkedip. Background hanya muncul di home; header, footer, dan teks tetap
+  solid di atasnya.
 - **Header & footer**: keduanya menempel di layar (`position: sticky`) saat halaman
   di-scroll. Header di atas, footer di bawah, dengan latar solid agar konten tidak
   tembus.

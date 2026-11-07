@@ -560,6 +560,20 @@
 
   /* ---------- form ---------- */
 
+  function syncBackgroundPreview(persist) {
+    const style = $('[data-field="background"]');
+    const opacity = $('[data-field="backgroundOpacity"]');
+    const label = $("[data-bg-opacity-label]");
+    if (!style || !opacity) return;
+
+    const percent = Math.min(100, Math.max(0, Math.round(Number(opacity.value) || 0)));
+    if (label) label.textContent = percent + "%";
+
+    if (typeof window.tzApplyBackground === "function") {
+      window.tzApplyBackground(style.value, percent, persist);
+    }
+  }
+
   function fillForm(content) {
     $('[data-field="name"]').value = content.name || "";
     $('[data-field="version"]').value = content.version || "";
@@ -572,6 +586,14 @@
         window.tzApplyFont(fontField.value);
       }
     }
+    const backgroundField = $('[data-field="background"]');
+    const opacityField = $('[data-field="backgroundOpacity"]');
+    if (backgroundField) backgroundField.value = content.background || "code";
+    if (opacityField) {
+      const opacity = Number(content.backgroundOpacity);
+      opacityField.value = String(Number.isFinite(opacity) ? Math.min(100, Math.max(0, Math.round(opacity))) : 12);
+    }
+    syncBackgroundPreview(true);
     renderProjectRows(content.projects);
     renderSocialRows(content.socials);
     renderPostRows(content.posts);
@@ -584,6 +606,10 @@
       version: $('[data-field="version"]').value.trim(),
       github: $('[data-field="github"]').value.trim(),
       font: $('[data-field="font"]') ? $('[data-field="font"]').value : "jetbrains",
+      background: $('[data-field="background"]') ? $('[data-field="background"]').value : "code",
+      backgroundOpacity: $('[data-field="backgroundOpacity"]')
+        ? Number($('[data-field="backgroundOpacity"]').value)
+        : 12,
       projects: $$("[data-project-row]", projectsBox)
         .map((card) => ({
           title: $("[data-project-title]", card).value.trim(),
@@ -719,6 +745,14 @@
     }, 350);
   });
 
+  $('[data-field="background"]')?.addEventListener("change", () => {
+    syncBackgroundPreview(false);
+  });
+
+  $('[data-field="backgroundOpacity"]')?.addEventListener("input", () => {
+    syncBackgroundPreview(false);
+  });
+
   editorForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -768,6 +802,8 @@
       if (fontField && typeof window.tzApplyFont === "function") {
         window.tzApplyFont(fontField.value);
       }
+
+      syncBackgroundPreview(true);
 
       setStatus(statusEl, "tersimpan ✓", "ok");
     } catch (e) {

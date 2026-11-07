@@ -95,6 +95,18 @@
             </select>
           </label>
           <label class="field">
+            <span class="field-label">background home</span>
+            <select class="input select" data-field="background">
+              <option value="code">kode (default)</option>
+              <option value="grid">grid titik</option>
+              <option value="none">tanpa background</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">opasitas background — <output data-bg-opacity-label>12%</output></span>
+            <input class="input range" type="range" min="0" max="100" step="1" value="12" data-field="backgroundOpacity">
+          </label>
+          <label class="field">
             <span class="field-label">username github (untuk repo publik)</span>
             <input class="input" data-field="github" maxlength="39" placeholder="username">
           </label>

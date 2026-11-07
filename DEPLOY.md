@@ -191,6 +191,7 @@ Setelah disimpan, isi KV yang dipakai. File `content.json` hanya fallback selama
 | `/admin` | Empat tab (profil/project/tulisan/sosial), tombol **Sign in with GitHub**, bisa simpan → status `tersimpan ✓` |
 | `/admin` → project | Klik judul membuka editor; URL terisi → stack terdeteksi otomatis (badge muncul di bawah judul di `/projects`) |
 | `/admin` → profil → font | Pilih font → otomatis tersimpan → seluruh situs memakai font baru setelah refresh |
+| `/admin` → profil → background | Pilih gaya + geser opasitas → simpan → background tipis muncul di home |
 | Scroll halaman panjang | Header dan footer tetap menempel di layar |
 | Tab browser | Ikon **TZ** muncul (favicon) di semua halaman |
 | `/admin` → sosial | Tempel link Instagram/Facebook → ikon brand muncul otomatis di `/`; link asing memakai ikon rantai |

@@ -3,6 +3,9 @@
   const THEME_KEY = "tenzou-theme";
   const FONT_KEY = "tenzou-font";
   const FONTS = ["jetbrains", "ibm", "space", "fira", "system"];
+  const BG_KEY = "tenzou-bg";
+  const BG_OPACITY_KEY = "tenzou-bg-opacity";
+  const BACKGROUNDS = ["none", "code", "grid"];
   const root = document.documentElement;
   const toggle = document.querySelector("[data-theme-toggle]");
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -12,6 +15,23 @@
     root.dataset.font = font;
     try {
       localStorage.setItem(FONT_KEY, font);
+    } catch (e) {
+      /* storage blocked */
+    }
+  };
+
+  window.tzApplyBackground = (style, opacity, persist = true) => {
+    const bg = BACKGROUNDS.includes(style) ? style : "code";
+    const value = Number(opacity);
+    const percent = Number.isFinite(value) ? Math.min(100, Math.max(0, Math.round(value))) : 12;
+
+    root.dataset.bg = bg;
+    root.style.setProperty("--bg-art-opacity", String(percent / 100));
+
+    if (!persist) return;
+    try {
+      localStorage.setItem(BG_KEY, bg);
+      localStorage.setItem(BG_OPACITY_KEY, String(percent));
     } catch (e) {
       /* storage blocked */
     }

@@ -102,6 +102,8 @@ a {
 /* ---------- shell ---------- */
 
 .shell {
+  position: relative;
+  z-index: 1;
   width: 100%;
   margin: 0 auto;
   padding: var(--pad-y) 0;
@@ -110,6 +112,96 @@ a {
   display: flex;
   flex-direction: column;
   gap: clamp(20px, 5vh, 44px);
+}
+
+/* ---------- home background ---------- */
+
+.bg-art {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--bg-art-opacity, 0.12);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+  transition: opacity 0.35s ease;
+}
+
+body:not([data-page="home"]) .bg-art,
+html[data-bg="none"] .bg-art {
+  display: none;
+}
+
+.bg-art pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre;
+}
+
+.bg-code {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: radial-gradient(ellipse 74% 70% at 50% 48%, transparent 0%, transparent 38%, #000 82%);
+  mask-image: radial-gradient(ellipse 74% 70% at 50% 48%, transparent 0%, transparent 38%, #000 82%);
+}
+
+.bg-code-left {
+  position: absolute;
+  left: clamp(12px, 4vw, 52px);
+  bottom: 7%;
+  max-width: 46ch;
+  opacity: 0.62;
+}
+
+.bg-code-right {
+  position: absolute;
+  right: clamp(12px, 4vw, 52px);
+  top: 12%;
+  max-width: 38ch;
+  opacity: 0.5;
+}
+
+.bg-grid {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1.5px);
+  background-size: 26px 26px;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(ellipse 78% 74% at 50% 50%, #000 0%, transparent 74%);
+  mask-image: radial-gradient(ellipse 78% 74% at 50% 50%, #000 0%, transparent 74%);
+}
+
+html[data-bg="grid"] .bg-code {
+  display: none;
+}
+
+html[data-bg="grid"] .bg-grid {
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .bg-code-right {
+    display: none;
+  }
+
+  .bg-art .bg-code-left {
+    bottom: 5%;
+    left: 10px;
+    font-size: 9px;
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-art {
+    transition: none;
+  }
 }
 
 /* ---------- top bar ---------- */
@@ -917,6 +1009,51 @@ body[data-page="blog"] .row-title {
 .select option {
   background: var(--bg);
   color: var(--fg);
+}
+
+.range {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hair);
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  margin-top: -4.5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fg);
+}
+
+.range::-moz-range-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hair);
+}
+
+.range::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fg);
+}
+
+.range:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 3px;
 }
 
 .grid-2 {
