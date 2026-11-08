@@ -153,8 +153,13 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Versi footer**: `GET /api/status` membaca `CF_PAGES_COMMIT_SHA`, menghitung commit
   lewat GitHub API, lalu menampilkan `v1.<jumlah commit>.0-<short sha>`. Hasilnya
   di-cache di KV (`site:status`), jadi tidak memanggil GitHub di setiap request.
-- **Uptime**: angka `hari.jammenitdetikratusan` (contoh `3.13542030`) di bawah
+- **Uptime**: angka `hari.jammenitdetikmilidetik` (contoh `3.135420307`) di bawah
   koordinat, dihitung dari tanggal repo dibuat dan berdetak tiap frame.
+- **Intro berwarna**: teks intro di home mendukung penanda ala Markdown yang
+  dirender jadi warna ala editor kode: `` `kata` `` (hijau, seperti token kode),
+  `**kata**` (ungu), `*kata*` (miring), `__kata__` (garis bawah), dan
+  `[teks](https://…)` (tautan). Tulis penandanya langsung di `/admin` → tab
+  **profil** → **intro**; teks yang terlihat tetap sama, hanya gayanya yang berubah.
 - **Tema**: `localStorage` (`tenzou-theme`), tombol `light.` / `dark.`, shortcut `t`.
 - **Font**: pilihan font tampilan disimpan di konten (`font`) dan dipilih lewat
   `/admin` → tab **profil** → **font tampilan**. Pilihan: JetBrains Mono (default),
@@ -171,8 +176,9 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 - **Header & footer**: keduanya menempel di layar (`position: sticky`) saat halaman
   di-scroll. Header di atas, footer di bawah, dengan latar solid agar konten tidak
   tembus.
-- **Favicon**: `favicon.svg` berisi wordmark **TZ** (putih di atas hitam), dengan
-  `favicon-32.png` dan `apple-touch-icon.png` sebagai fallback. Semua halaman
+- **Favicon**: `favicon.svg` berisi monogram **tz** (putih di atas kartu hitam
+  membulat, hasil vektor dari logo asli), dengan `favicon-32.png`,
+  `apple-touch-icon.png`, dan `favicon-512.png` sebagai fallback. Semua halaman
   memakai ikon yang sama.
 - **Ikon sosial**: ikon ditentukan dari URL, bukan dari pilihan tipe. Tempel link
   Instagram/Facebook/LinkedIn/YouTube/TikTok/WhatsApp/Discord/Reddit/Pinterest/

@@ -22,6 +22,8 @@
   --toast-fg: #000000;
   --ok: #6ee7a8;
   --err: #ff8080;
+  --tok-code: #9ece6a;
+  --tok-strong: #bb9af7;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --pad-x: clamp(36px, 10vw, 56px);
   --edge-x: clamp(18px, 2.4vw, 26px);
@@ -54,6 +56,8 @@ html[data-theme="light"] {
   --toast-fg: #f3f1ec;
   --ok: #167a45;
   --err: #b42323;
+  --tok-code: #2f7a3f;
+  --tok-strong: #6b46c1;
   color-scheme: light;
 }
 
@@ -330,6 +334,36 @@ body.content-ready .hero {
   text-wrap: pretty;
 }
 
+.intro code {
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(158, 206, 106, 0.1);
+  color: var(--tok-code);
+  font: inherit;
+}
+
+.intro strong {
+  font-weight: 500;
+  color: var(--tok-strong);
+}
+
+.intro em {
+  font-style: italic;
+}
+
+.intro .u {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--dim);
+  text-underline-offset: 3px;
+}
+
+.intro a {
+  color: var(--tok-code);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .intro .coords {
   margin-top: clamp(14px, 2.8vh, 22px);
   color: var(--dim);
@@ -368,8 +402,8 @@ body.content-ready .hero {
 
 .socials svg {
   display: block;
-  width: 21px;
-  height: 21px;
+  height: 25px;
+  width: auto;
 }
 
 /* ---------- footer ---------- */

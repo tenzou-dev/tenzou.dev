@@ -7,7 +7,7 @@
 
   const ICONS = {
     email:
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 6.5 8.5 6 8.5-6"></path></svg>',
+      '<svg viewBox="2.45 2.95 19.1 18.1" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3.5" width="18" height="17" rx="2.5"></rect><path d="m3.6 5.4 8.4 6.4 8.4-6.4"></path></svg>',
     github:
       '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>',
     x:
@@ -294,14 +294,19 @@
       const hours = Math.floor(total / 3600000) % 24;
       const minutes = Math.floor(total / 60000) % 60;
       const seconds = Math.floor(total / 1000) % 60;
-      const hundredths = Math.floor(total / 10) % 100;
+      const millis = Math.floor(total) % 1000;
 
       el.textContent =
-        days + "." + pad(hours) + pad(minutes) + pad(seconds) + pad(hundredths);
+        days +
+        "." +
+        pad(hours) +
+        pad(minutes) +
+        pad(seconds) +
+        String(millis).padStart(3, "0");
       el.hidden = false;
     };
 
-    el.title = "Site uptime (days.hhmmss.hh)";
+    el.title = "Site uptime (days.hhmmss.mmm)";
     tick();
 
     const frame = () => {
@@ -383,12 +388,75 @@
     return Math.max(1, Math.round(words / 200));
   }
 
+  function appendInline(text, parent) {
+    const pattern =
+      /(`[^`\n]+`|\*\*[^*\n]+\*\*|__[^_\n]+__|\[[^\]\n]+\]\(https?:\/\/[^)\s]+\)|\*[^*\n]+\*)/g;
+    let last = 0;
+    let match;
+
+    while ((match = pattern.exec(text))) {
+      if (match.index > last) {
+        parent.append(document.createTextNode(text.slice(last, match.index)));
+      }
+
+      const token = match[0];
+
+      if (token.startsWith("`")) {
+        const code = document.createElement("code");
+        code.textContent = token.slice(1, -1);
+        parent.append(code);
+      } else if (token.startsWith("**")) {
+        const strong = document.createElement("strong");
+        strong.textContent = token.slice(2, -2);
+        parent.append(strong);
+      } else if (token.startsWith("__")) {
+        const underline = document.createElement("span");
+        underline.className = "u";
+        underline.textContent = token.slice(2, -2);
+        parent.append(underline);
+      } else if (token.startsWith("[")) {
+        const link = /^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/.exec(token);
+        if (link) {
+          const a = document.createElement("a");
+          a.href = link[2];
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.textContent = link[1];
+          parent.append(a);
+        } else {
+          parent.append(document.createTextNode(token));
+        }
+      } else {
+        const em = document.createElement("em");
+        em.textContent = token.slice(1, -1);
+        parent.append(em);
+      }
+
+      last = pattern.lastIndex;
+    }
+
+    if (last < text.length) {
+      parent.append(document.createTextNode(text.slice(last)));
+    }
+  }
+
+  function renderInlineText(text, parent) {
+    const lines = String(text || "").split("\n");
+    lines.forEach((line, index) => {
+      if (index) parent.append(document.createElement("br"));
+      appendInline(line, parent);
+    });
+  }
+
   function renderHome(content) {
     const nameEl = $("[data-name]");
     if (nameEl) renderName(nameEl, content.name);
 
     const intro = $("[data-intro]");
-    if (intro && content.intro) intro.textContent = content.intro;
+    if (intro && content.intro) {
+      intro.textContent = "";
+      renderInlineText(content.intro, intro);
+    }
 
     renderSocials($("[data-socials]"), content.socials);
     renderWhere($("[data-where]"));
