@@ -120,13 +120,16 @@ async function readGithubRepo(repo, env) {
 
   if (env.GITHUB_TOKEN) headers.authorization = "Bearer " + env.GITHUB_TOKEN;
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 7000);
+
   try {
     const res = await fetch(
       "https://api.github.com/repos/" +
         encodeURIComponent(repo.owner) +
         "/" +
         encodeURIComponent(repo.name),
-      { headers }
+      { headers, signal: controller.signal }
     );
 
     if (res.status === 404) {
@@ -169,7 +172,36 @@ async function readGithubRepo(repo, env) {
     };
   } catch (e) {
     return { repo: fallbackRepo(repo), unverified: true };
+  } finally {
+    clearTimeout(timer);
   }
+}
+
+const META_RETRY_MS = 5 * 60 * 1000;
+
+function shouldRefresh(item) {
+  if (!item || !item.unverified || !item.repo) return false;
+  const last = Date.parse(item.metadataCheckedAt || item.submittedAt || 0);
+  return !Number.isFinite(last) || Date.now() - last > META_RETRY_MS;
+}
+
+/** Retries GitHub metadata for an item that was saved without it. */
+async function refreshItem(item, env) {
+  if (!item || !item.repo || !item.repo.owner || !item.repo.name) return false;
+
+  item.metadataCheckedAt = new Date().toISOString();
+
+  const repo = githubRepo(
+    "https://github.com/" + item.repo.owner + "/" + item.repo.name
+  );
+  if (!repo) return false;
+
+  const meta = await readGithubRepo(repo, env);
+  if (meta.error || meta.unverified || !meta.repo) return false;
+
+  item.repo = meta.repo;
+  item.unverified = false;
+  return true;
 }
 
 async function readState(env) {
@@ -229,6 +261,15 @@ export async function onRequestGet({ request, env }) {
     if (!(await isAdmin(request, env))) {
       return json({ ok: false, error: "unauthorized" }, 401);
     }
+
+    let attempted = false;
+    for (const item of [...state.pending, ...state.approved]) {
+      if (!shouldRefresh(item)) continue;
+      attempted = true;
+      await refreshItem(item, env);
+    }
+    if (attempted) await writeState(env, state);
+
     return json({
       ok: true,
       pending: state.pending,
@@ -292,6 +333,29 @@ export async function onRequestPost({ request, env }) {
       }
       await writeState(env, state);
       return json({ ok: true, approved: state.approved, pending: state.pending });
+    }
+
+    if (action === "refresh") {
+      const items = id
+        ? [...state.pending, ...state.approved].filter((item) => item.id === id)
+        : [...state.pending, ...state.approved].filter((item) => item.unverified);
+
+      if (!items.length) {
+        return json({ ok: false, error: "project tidak ditemukan" }, 404);
+      }
+
+      let refreshed = 0;
+      for (const item of items) {
+        if (await refreshItem(item, env)) refreshed += 1;
+      }
+      await writeState(env, state);
+
+      return json({
+        ok: true,
+        refreshed,
+        approved: state.approved,
+        pending: state.pending,
+      });
     }
 
     return json({ ok: false, error: "aksi tidak dikenal" }, 400);
@@ -359,6 +423,7 @@ export async function onRequestPost({ request, env }) {
     demo,
     repo: meta.repo,
     unverified: Boolean(meta.unverified),
+    metadataCheckedAt: new Date().toISOString(),
     submittedAt: new Date().toISOString(),
     approvedAt: null,
   };

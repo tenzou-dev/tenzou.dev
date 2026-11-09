@@ -131,7 +131,10 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   dibuat seperti share card repo GitHub: avatar, `owner/repo`, deskripsi, bahasa,
   bintang, dan tautan sosial. Hanya repo publik yang boleh dikirim. Admin bisa
   menambah repo pilihan lewat **+ tambah manual** di tab **komunitas**; selama
-  sesi admin aktif, kiriman langsung tampil tanpa antrean review.
+  sesi admin aktif, kiriman langsung tampil tanpa antrean review. Kalau GitHub
+  sedang membatasi permintaan (rate limit), repo tetap disimpan dengan metadata
+  sementara; buka tab **komunitas** lagi atau tekan **perbarui metadata** untuk
+  mengambil bintang/bahasa/avatar yang benar.
 - **Deteksi stack**: saat URL project diisi/diubah (atau lewat tombol **deteksi**),
   `/admin` memanggil `GET /api/project-meta?url=...`. Endpoint ini hanya untuk sesi
   admin, menolak host privat/lokal, lalu membaca metadata: repo GitHub lewat GitHub

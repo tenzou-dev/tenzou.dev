@@ -646,6 +646,15 @@
     const actions = document.createElement("div");
     actions.className = "community-admin-actions";
 
+    if (item.unverified) {
+      const refresh = document.createElement("button");
+      refresh.type = "button";
+      refresh.className = "btn btn--ghost btn--sm";
+      refresh.textContent = "perbarui metadata";
+      refresh.addEventListener("click", () => communityAction("refresh", item.id));
+      actions.append(refresh);
+    }
+
     if (status === "pending") {
       const approve = document.createElement("button");
       approve.type = "button";
@@ -763,7 +772,13 @@
 
       const refreshed = await loadCommunityAdmin();
       if (refreshed) {
-        setStatus(communityStatus, action === "approve" ? "disetujui ✓" : "dihapus ✓", "ok");
+        const labels = {
+          approve: "disetujui ✓",
+          reject: "ditolak ✓",
+          delete: "dihapus ✓",
+          refresh: "metadata diperbarui ✓",
+        };
+        setStatus(communityStatus, labels[action] || "selesai ✓", "ok");
       }
     } catch (e) {
       setStatus(communityStatus, String(e && e.message ? e.message : e), "err");
