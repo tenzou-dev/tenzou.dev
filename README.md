@@ -34,6 +34,7 @@ tenzou-dev/
 │     │  ├─ callback.js  # GET /api/auth/callback
 │     │  └─ session.js   # GET / DELETE /api/auth/session
 │     ├─ blog.js         # GET /api/blog + POST like/komentar
+│     ├─ community.js    # GET /api/community + POST kirim/moderasi project komunitas
 │     ├─ content.js      # GET / PUT /api/content
 │     ├─ project-meta.js # GET /api/project-meta (deteksi bahasa/stack)
 │     ├─ status.js       # GET /api/status (versi commit + uptime)
@@ -103,7 +104,7 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 ### Setelah deploy pertama
 
 1. Buka `/admin`, klik **Sign in with GitHub** (hanya akun `GITHUB_OWNER` yang diterima).
-2. Admin dibagi menjadi empat tab: **profil**, **project**, **tulisan**, **sosial**.
+2. Admin dibagi menjadi lima tab: **profil**, **project**, **komunitas**, **tulisan**, **sosial**.
    Tab terakhir yang dibuka diingat di `localStorage`.
 3. Di tab **project** dan **tulisan**, daftar tampil sebagai judul saja. Klik judul
    untuk membuka editornya, klik lagi untuk menutup.
@@ -121,6 +122,16 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   1. **Project manual** dari `/admin` — untuk karya yang tidak ada di GitHub.
   2. **Repo publik** dari GitHub API (`/users/<username>/repos?type=owner`).
   Repo internal instansi tidak pernah ikut. Hasil GitHub di-cache 10 menit.
+- **Project komunitas**: `/projects` punya tab **komunitas** berisi repo orang lain.
+  Pengunjung bisa menekan **+ tambah**, mengisi judul, deskripsi, link repo GitHub,
+  Threads/sosmed, dan link demo, lalu mencentang persetujuan. Kiriman masuk ke
+  antrean **pending** di KV; admin menyetujui atau menolaknya lewat
+  `/admin` → tab **komunitas**. Saat dikirim, repo dicek ke GitHub API untuk
+  mengambil avatar, bahasa, bintang, lisensi, dan waktu update. Tampilan kartunya
+  dibuat seperti share card repo GitHub: avatar, `owner/repo`, deskripsi, bahasa,
+  bintang, dan tautan sosial. Hanya repo publik yang boleh dikirim. Admin bisa
+  menambah repo pilihan lewat **+ tambah manual** di tab **komunitas**; selama
+  sesi admin aktif, kiriman langsung tampil tanpa antrean review.
 - **Deteksi stack**: saat URL project diisi/diubah (atau lewat tombol **deteksi**),
   `/admin` memanggil `GET /api/project-meta?url=...`. Endpoint ini hanya untuk sesi
   admin, menolak host privat/lokal, lalu membaca metadata: repo GitHub lewat GitHub
@@ -130,9 +141,9 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   project (satu badge per item, dipisah `·`); field ini tetap bisa diedit manual.
   Repo GitHub juga menampilkan bahasa di bawah judul dengan cara yang sama.
   Kalau tidak terdeteksi, isi sendiri — tidak apa-apa.
-- **Admin**: satu halaman dengan empat tab (profil, project, tulisan, sosial). Daftar
-  project dan tulisan tampil ringkas sebagai judul; klik untuk membuka editor. Tab
-  terakhir disimpan di `localStorage` supaya tidak kembali ke atas setiap reload.
+- **Admin**: satu halaman dengan lima tab (profil, project, komunitas, tulisan, sosial).
+  Daftar project dan tulisan tampil ringkas sebagai judul; klik untuk membuka editor.
+  Tab terakhir disimpan di `localStorage` supaya tidak kembali ke atas setiap reload.
 - **Blog**: setiap tulisan punya `title`, `date`, `summary`, `tags`, `body`, dan
   `slug` yang dibuat dari judul (bisa diubah lewat data tersimpan). Daftar di
   `/blog` menampilkan tanggal, estimasi waktu baca, ringkasan, dan tag. Membuka
@@ -194,6 +205,7 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 | Nama, intro, username GitHub, font, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
 | Artikel + tag | `/admin` → tab **tulisan** (tag dipisah koma) |
 | Project manual (di luar GitHub) | `/admin` → tab **project** (stack terisi otomatis dari URL) |
+| Project komunitas (kiriman pengunjung) | `/admin` → tab **komunitas** (setujui / tolak) |
 | Link sosial | `/admin` → tab **sosial** |
 | Username GitHub | `/admin` → "username github" |
 | Login GitHub | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_OWNER`, `SESSION_SECRET` |
@@ -237,6 +249,7 @@ untuk `/api/auth/*` kalau mau ekstra.
 - `/api/auth/session` → `functions/api/auth/session.js`
 - `/api/content` → `functions/api/content.js`
 - `/api/blog` → `functions/api/blog.js`
+- `/api/community` → `functions/api/community.js`
 - `/api/project-meta` → `functions/api/project-meta.js`
 - `/api/status` → `functions/api/status.js`
 - `/api/where` → `functions/api/where.js`

@@ -525,9 +525,453 @@
     });
   }
 
+  let projectsTabsReady = false;
+  let communityFormReady = false;
+  let communityLoaded = false;
+  let communityLoading = false;
+
+  const LANGUAGE_COLORS = {
+    JavaScript: "#f1e05a",
+    TypeScript: "#3178c6",
+    Python: "#3572a5",
+    HTML: "#e34c26",
+    CSS: "#563d7c",
+    SCSS: "#c6538c",
+    Shell: "#89e051",
+    Go: "#00add8",
+    Rust: "#dea584",
+    PHP: "#4f5d95",
+    Ruby: "#701516",
+    Java: "#b07219",
+    "C++": "#f34b7d",
+    C: "#555555",
+    "C#": "#178600",
+    Vue: "#41b883",
+    Svelte: "#ff3e00",
+    Astro: "#ff5a03",
+    Dart: "#00b4ab",
+    Kotlin: "#a97bff",
+    Swift: "#f05138",
+    Lua: "#000080",
+    Nix: "#7e7eff",
+    Dockerfile: "#384d54",
+  };
+
+  function communityNote(text) {
+    const note = document.createElement("p");
+    note.className = "list-note";
+    note.textContent = text;
+    return note;
+  }
+
+  function updateCommunityCount(count) {
+    const badge = $("[data-community-count]");
+    if (!badge) return;
+    badge.textContent = count > 0 ? String(count) : "";
+    badge.hidden = !(count > 0);
+  }
+
+  function setProjectTab(name, remember) {
+    const active = name === "community" ? "community" : "mine";
+    const tabs = $$("[data-projects-tab]");
+    const panes = $$("[data-projects-pane]");
+    const add = $("[data-community-open]");
+    const subMine = $("[data-projects-sub-mine]");
+    const subCommunity = $("[data-projects-sub-community]");
+
+    tabs.forEach((tab) => {
+      const selected = tab.dataset.projectsTab === active;
+      tab.classList.toggle("is-active", selected);
+      tab.setAttribute("aria-selected", selected ? "true" : "false");
+      tab.tabIndex = selected ? 0 : -1;
+    });
+
+    panes.forEach((pane) => {
+      pane.hidden = pane.dataset.projectsPane !== active;
+    });
+
+    if (add) add.hidden = active !== "community";
+    if (subMine) subMine.hidden = active !== "mine";
+    if (subCommunity) subCommunity.hidden = active !== "community";
+
+    if (remember) {
+      try {
+        history.replaceState(
+          null,
+          "",
+          active === "community" ? "#komunitas" : location.pathname + location.search
+        );
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
+    if (active === "community") loadCommunity();
+  }
+
+  function initProjectTabs() {
+    if (projectsTabsReady) return;
+    const tabs = $$("[data-projects-tab]");
+    if (!tabs.length) return;
+
+    projectsTabsReady = true;
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => setProjectTab(tab.dataset.projectsTab, true));
+      tab.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+        event.preventDefault();
+        const index = tabs.indexOf(tab);
+        const next = tabs[(index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
+        next.focus();
+        setProjectTab(next.dataset.projectsTab, true);
+      });
+    });
+
+    const initial =
+      location.hash === "#komunitas" ||
+      location.hash === "#komunitas-tambah" ||
+      new URLSearchParams(location.search).get("tambah") === "1"
+        ? "community"
+        : "mine";
+    setProjectTab(initial, false);
+  }
+
+  function communityCard(project) {
+    const repo = project.repo && typeof project.repo === "object" ? project.repo : {};
+    const owner = String(repo.owner || "").trim() || "github";
+    const name = String(repo.name || "").trim() || "repo";
+    const repoUrl =
+      safeUrl(repo.url, false) ||
+      "https://github.com/" + encodeURIComponent(owner) + "/" + encodeURIComponent(name);
+
+    const card = document.createElement("article");
+    card.className = "gh-card";
+
+    const head = document.createElement("div");
+    head.className = "gh-head";
+
+    const avatarWrap = document.createElement("span");
+    avatarWrap.className = "gh-avatar-wrap";
+    const avatar = document.createElement("img");
+    avatar.className = "gh-avatar";
+    avatar.alt = "";
+    avatar.loading = "lazy";
+    avatar.decoding = "async";
+    avatar.width = 40;
+    avatar.height = 40;
+    avatar.referrerPolicy = "no-referrer";
+    avatar.src =
+      safeUrl(repo.avatar, false) ||
+      "https://github.com/" + encodeURIComponent(owner) + ".png?size=80";
+
+    const showInitial = () => {
+      avatar.remove();
+      avatarWrap.classList.add("is-letter");
+      avatarWrap.textContent = owner.charAt(0).toUpperCase() || "?";
+    };
+
+    avatar.addEventListener("error", showInitial, { once: true });
+    avatarWrap.append(avatar);
+
+    const ident = document.createElement("div");
+    ident.className = "gh-ident";
+
+    const repoLink = document.createElement("a");
+    repoLink.className = "gh-repo";
+    repoLink.href = repoUrl;
+    repoLink.target = "_blank";
+    repoLink.rel = "noopener noreferrer";
+
+    const ownerSpan = document.createElement("span");
+    ownerSpan.className = "gh-owner";
+    ownerSpan.textContent = owner;
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "gh-name";
+    nameSpan.textContent = name;
+
+    repoLink.append(ownerSpan, " / ", nameSpan);
+
+    const title = document.createElement("p");
+    title.className = "gh-title";
+    title.textContent = String(project.title || "").trim() || name;
+
+    ident.append(repoLink, title);
+
+    head.append(avatarWrap, ident);
+
+    const stars = Math.max(0, Math.floor(Number(repo.stars) || 0));
+    if (stars > 0) {
+      const star = document.createElement("span");
+      star.className = "gh-stars";
+      star.textContent = "★ " + stars;
+      star.title = stars + " stars";
+      head.append(star);
+    }
+
+    card.append(head);
+
+    const description = String(project.description || "").trim();
+    if (description) {
+      const desc = document.createElement("p");
+      desc.className = "gh-desc";
+      desc.textContent = description;
+      card.append(desc);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "gh-meta";
+
+    const language = String(repo.language || "").trim();
+    if (language) {
+      const lang = document.createElement("span");
+      lang.className = "gh-lang";
+      const dot = document.createElement("span");
+      dot.className = "gh-dot";
+      dot.style.background = LANGUAGE_COLORS[language] || "var(--dim)";
+      lang.append(dot, language);
+      meta.append(lang);
+    }
+
+    if (repo.license) {
+      const license = document.createElement("span");
+      license.textContent = repo.license;
+      meta.append(license);
+    }
+
+    const pushed = String(repo.pushedAt || "").slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(pushed)) {
+      const updated = document.createElement("span");
+      updated.textContent = "updated " + formatDate(pushed);
+      meta.append(updated);
+    }
+
+    const socialUrl = safeUrl(project.social, false);
+    if (socialUrl) {
+      const type = detectSocialType(socialUrl, "");
+      const label = SOCIAL_LABEL[type] || SOCIAL_LABEL.link;
+
+      const social = document.createElement("a");
+      social.className = "gh-social";
+      social.href = socialUrl;
+      social.target = "_blank";
+      social.rel = "noopener noreferrer";
+
+      let handle = "";
+      try {
+        const parsed = new URL(socialUrl);
+        const segment = parsed.pathname.split("/").filter(Boolean)[0] || "";
+        handle = segment.replace(/^@+/, "");
+      } catch (e) {
+        /* ignore */
+      }
+
+      const icon = document.createElement("span");
+      icon.className = "gh-social-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = ICONS[type] || ICONS.link;
+
+      const text = document.createElement("span");
+      text.textContent = handle ? "@" + handle : label.toLowerCase();
+
+      social.setAttribute("aria-label", label + (handle ? " @" + handle : ""));
+      social.append(icon, text);
+      meta.append(social);
+    }
+
+    const demoUrl = safeUrl(project.demo, false);
+    if (demoUrl) {
+      const demo = document.createElement("a");
+      demo.className = "gh-social";
+      demo.href = demoUrl;
+      demo.target = "_blank";
+      demo.rel = "noopener noreferrer";
+      demo.textContent = "demo ↗";
+      meta.append(demo);
+    }
+
+    if (project.author) {
+      const author = document.createElement("span");
+      author.textContent = "by " + String(project.author).trim();
+      meta.append(author);
+    }
+
+    if (meta.childElementCount) card.append(meta);
+
+    return card;
+  }
+
+  function renderCommunity(container, projects) {
+    container.textContent = "";
+
+    const items = (Array.isArray(projects) ? projects : []).filter(
+      (project) => project && String(project.title || "").trim() && project.repo
+    );
+
+    if (!items.length) {
+      container.append(
+        communityNote("belum ada project komunitas. kalau kamu punya repo, tekan + tambah.")
+      );
+      return;
+    }
+
+    items.forEach((project) => container.append(communityCard(project)));
+  }
+
+  async function loadCommunity(force) {
+    const list = $("[data-community]");
+    if (!list) return;
+    if (communityLoading || (communityLoaded && !force)) return;
+
+    communityLoading = true;
+    list.textContent = "";
+    list.append(communityNote("memuat…"));
+
+    try {
+      const res = await fetch("/api/community", {
+        headers: { accept: "application/json" },
+        cache: "no-store",
+      });
+
+      if (!res.ok) throw new Error("http " + res.status);
+
+      const data = await res.json();
+      const projects = data && Array.isArray(data.projects) ? data.projects : [];
+
+      communityLoaded = true;
+      renderCommunity(list, projects);
+      updateCommunityCount(projects.length);
+    } catch (e) {
+      list.textContent = "";
+      list.append(communityNote("daftar komunitas belum bisa dimuat. coba muat ulang halaman."));
+    } finally {
+      communityLoading = false;
+    }
+  }
+
+  function setupCommunityForm() {
+    if (communityFormReady) return;
+
+    const open = $("[data-community-open]");
+    const form = $("[data-community-form]");
+    const close = $("[data-community-close]");
+    const status = $("[data-community-status]");
+    if (!open || !form) return;
+
+    communityFormReady = true;
+
+    const setFormStatus = (message, kind) => {
+      if (!status) return;
+      status.textContent = message || "";
+      status.className = "status" + (kind ? " status--" + kind : "");
+    };
+
+    open.addEventListener("click", () => {
+      form.hidden = false;
+      setFormStatus("");
+      const first = $('input[name="title"]', form);
+      if (first) first.focus();
+    });
+
+    if (close) {
+      close.addEventListener("click", () => {
+        form.hidden = true;
+        setFormStatus("");
+      });
+    }
+
+    const wantsAdd =
+      location.hash === "#komunitas-tambah" ||
+      new URLSearchParams(location.search).get("tambah") === "1";
+
+    if (wantsAdd) {
+      form.hidden = false;
+      queueMicrotask(() => {
+        const first = $('input[name="title"]', form);
+        if (first) first.focus();
+      });
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const data = new FormData(form);
+      const payload = {
+        title: String(data.get("title") || "").trim(),
+        author: String(data.get("author") || "").trim(),
+        description: String(data.get("description") || "").trim(),
+        repo: String(data.get("repo") || "").trim(),
+        social: String(data.get("social") || "").trim(),
+        demo: String(data.get("demo") || "").trim(),
+        website: String(data.get("website") || ""),
+        consent: data.get("consent") === "on",
+      };
+
+      if (payload.title.length < 3) {
+        setFormStatus("judul minimal 3 karakter.", "err");
+        return;
+      }
+      if (payload.description.length < 10) {
+        setFormStatus("deskripsi minimal 10 karakter.", "err");
+        return;
+      }
+      if (!/^https?:\/\/(?:www\.)?github\.com\/[^/\s]+\/[^/\s]+/i.test(payload.repo)) {
+        setFormStatus("link repo harus URL GitHub, mis. github.com/username/repo.", "err");
+        return;
+      }
+      if (!payload.consent) {
+        setFormStatus("centang persetujuan dulu ya.", "err");
+        return;
+      }
+
+      const button = $('button[type="submit"]', form);
+      if (button) button.disabled = true;
+      setFormStatus("mengirim…");
+
+      let adminToken = "";
+      try {
+        adminToken = sessionStorage.getItem("tenzou-admin") || "";
+      } catch (e) {
+        /* ignore */
+      }
+
+      const headers = { "content-type": "application/json", accept: "application/json" };
+      if (adminToken) headers.authorization = "Bearer " + adminToken;
+
+      try {
+        const res = await fetch("/api/community", {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        const result = await res.json().catch(() => null);
+        if (!res.ok || !result || !result.ok) {
+          throw new Error((result && result.error) || "gagal mengirim (" + res.status + ")");
+        }
+
+        form.reset();
+        setFormStatus(result.message || "terkirim — menunggu review.", "ok");
+        if (typeof window.tzToast === "function") {
+          window.tzToast(result.project ? "project ditambahkan ✓" : "project terkirim. menunggu review ✓");
+        }
+        if (result.project) loadCommunity(true);
+      } catch (e) {
+        const message = String(e && e.message ? e.message : e);
+        setFormStatus(message, "err");
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  }
+
   function renderProjects(content) {
+    initProjectTabs();
+    setupCommunityForm();
+
     const list = $("[data-projects]");
-    const sub = $("[data-projects-sub]");
+    const sub = $("[data-projects-sub-mine]") || $("[data-projects-sub]");
     if (!list) return;
 
     const user = String(content.github || "").replace(/[^a-zA-Z0-9-]/g, "");
@@ -782,6 +1226,11 @@
         list.append(li);
       })
       .finally(() => clearTimeout(timer));
+  }
+
+  if (page === "projects") {
+    initProjectTabs();
+    setupCommunityForm();
   }
 
   Promise.all([loadContent(), loadStatus()]).then(([content, status]) => {

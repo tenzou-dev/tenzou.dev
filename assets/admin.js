@@ -15,6 +15,8 @@
   const socialsBox = $("[data-socials-editor]");
   const projectsBox = $("[data-projects-editor]");
   const postsBox = $("[data-posts-editor]");
+  const communityBox = $("[data-community-editor]");
+  const communityStatus = $("[data-community-status]");
   const signedAs = $("[data-signed-as]");
   const adminTitle = $("[data-admin-title]");
   const adminPage = adminTitle ? adminTitle.closest("main") : null;
@@ -104,7 +106,10 @@
   }
 
   tabButtons.forEach((button) => {
-    button.addEventListener("click", () => activateTab(button.dataset.adminTab));
+    button.addEventListener("click", () => {
+      activateTab(button.dataset.adminTab);
+      if (button.dataset.adminTab === "community") loadCommunityAdmin();
+    });
   });
 
   let cardSeq = 0;
@@ -559,6 +564,212 @@
     (list.length ? list : [{}]).forEach((item) => postsBox.append(postRow(item)));
   }
 
+  /* ---------- community moderation ---------- */
+
+  function adminHeaders(extra) {
+    const headers = Object.assign({ accept: "application/json" }, extra || {});
+    if (mode === "password") headers.authorization = "Bearer " + token();
+    return headers;
+  }
+
+  function communityDate(value) {
+    const raw = String(value || "").slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return "";
+    const date = new Date(raw + "T00:00:00");
+    if (Number.isNaN(date.getTime())) return raw;
+    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  function communityAdminRow(item, status) {
+    const repo = item && item.repo && typeof item.repo === "object" ? item.repo : {};
+    const row = document.createElement("div");
+    row.className = "community-admin-row";
+
+    const head = document.createElement("div");
+    head.className = "community-admin-head";
+
+    const title = document.createElement("span");
+    title.className = "community-admin-title";
+    title.textContent = String(item.title || "tanpa judul");
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = status === "pending" ? "pending" : "tampil";
+
+    const repoLink = document.createElement("a");
+    repoLink.className = "community-admin-repo";
+    repoLink.href = String(repo.url || "https://github.com");
+    repoLink.target = "_blank";
+    repoLink.rel = "noopener noreferrer";
+    repoLink.textContent = String(repo.fullName || repo.name || "repo");
+
+    head.append(title, badge, repoLink);
+
+    const desc = document.createElement("p");
+    desc.className = "community-admin-desc";
+    desc.textContent = String(item.description || "");
+
+    const meta = document.createElement("p");
+    meta.className = "community-admin-meta";
+
+    const bits = [];
+    if (item.submittedAt) bits.push("dikirim " + communityDate(item.submittedAt));
+    if (item.author) bits.push("oleh " + item.author);
+    if (repo.language) bits.push(repo.language);
+    if (repo.stars) bits.push("★ " + repo.stars);
+    if (item.unverified) bits.push("metadata belum terverifikasi");
+
+    meta.append(bits.join(" · "));
+
+    if (item.social) {
+      meta.append(" · ");
+      const social = document.createElement("a");
+      social.className = "community-admin-repo";
+      social.href = String(item.social);
+      social.target = "_blank";
+      social.rel = "noopener noreferrer";
+      social.textContent = "sosmed ↗";
+      meta.append(social);
+    }
+
+    if (item.demo) {
+      meta.append(" · ");
+      const demo = document.createElement("a");
+      demo.className = "community-admin-repo";
+      demo.href = String(item.demo);
+      demo.target = "_blank";
+      demo.rel = "noopener noreferrer";
+      demo.textContent = "demo ↗";
+      meta.append(demo);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "community-admin-actions";
+
+    if (status === "pending") {
+      const approve = document.createElement("button");
+      approve.type = "button";
+      approve.className = "btn btn--sm";
+      approve.textContent = "setujui";
+      approve.addEventListener("click", () => communityAction("approve", item.id));
+
+      const reject = document.createElement("button");
+      reject.type = "button";
+      reject.className = "btn btn--ghost btn--sm";
+      reject.textContent = "tolak";
+      reject.addEventListener("click", () => communityAction("reject", item.id));
+
+      actions.append(approve, reject);
+    } else {
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "btn btn--ghost btn--sm";
+      remove.textContent = "hapus";
+      remove.addEventListener("click", () => communityAction("delete", item.id));
+
+      actions.append(remove);
+    }
+
+    row.append(head, desc, meta, actions);
+    return row;
+  }
+
+  function renderCommunityAdmin(pending, approved) {
+    communityBox.textContent = "";
+
+    const pendingItems = Array.isArray(pending) ? pending : [];
+    const approvedItems = Array.isArray(approved) ? approved : [];
+
+    if (!pendingItems.length && !approvedItems.length) {
+      const note = document.createElement("p");
+      note.className = "list-note";
+      note.textContent = "belum ada kiriman project komunitas.";
+      communityBox.append(note);
+      return;
+    }
+
+    if (pendingItems.length) {
+      const heading = document.createElement("p");
+      heading.className = "hint";
+      heading.textContent = "menunggu review (" + pendingItems.length + ")";
+      communityBox.append(heading);
+      pendingItems.forEach((item) => communityBox.append(communityAdminRow(item, "pending")));
+    }
+
+    if (approvedItems.length) {
+      const heading = document.createElement("p");
+      heading.className = "hint";
+      heading.textContent = "tampil di /projects (" + approvedItems.length + ")";
+      communityBox.append(heading);
+      approvedItems.forEach((item) => communityBox.append(communityAdminRow(item, "approved")));
+    }
+  }
+
+  async function loadCommunityAdmin() {
+    if (!communityBox) return;
+
+    communityBox.textContent = "";
+    const loading = document.createElement("p");
+    loading.className = "list-note";
+    loading.textContent = "memuat…";
+    communityBox.append(loading);
+    setStatus(communityStatus, "");
+
+    try {
+      const res = await fetch("/api/community?all=1", {
+        headers: adminHeaders(),
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+
+      if (res.status === 401) throw new Error("login ulang");
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok) {
+        throw new Error((data && data.error) || "gagal memuat (" + res.status + ")");
+      }
+
+      renderCommunityAdmin(data.pending, data.approved);
+      return true;
+    } catch (e) {
+      communityBox.textContent = "";
+      const note = document.createElement("p");
+      note.className = "list-note";
+      note.textContent = "gagal memuat project komunitas.";
+      communityBox.append(note);
+      setStatus(communityStatus, String(e && e.message ? e.message : e), "err");
+      return false;
+    }
+  }
+
+  async function communityAction(action, id) {
+    if (!id) return;
+    setStatus(communityStatus, "memproses…");
+
+    try {
+      const res = await fetch("/api/community", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: adminHeaders({ "content-type": "application/json" }),
+        body: JSON.stringify({ action, id }),
+      });
+
+      if (res.status === 401) throw new Error("login ulang");
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok) {
+        throw new Error((data && data.error) || "gagal memproses (" + res.status + ")");
+      }
+
+      const refreshed = await loadCommunityAdmin();
+      if (refreshed) {
+        setStatus(communityStatus, action === "approve" ? "disetujui ✓" : "dihapus ✓", "ok");
+      }
+    } catch (e) {
+      setStatus(communityStatus, String(e && e.message ? e.message : e), "err");
+    }
+  }
+
   /* ---------- form ---------- */
 
   function syncBackgroundPreview(persist) {
@@ -692,6 +903,7 @@
       /* ignore */
     }
     activateTab(savedTab);
+    if (savedTab === "community") loadCommunityAdmin();
     autoDetectProjects();
 
     setStatus(statusEl, "");
@@ -834,6 +1046,8 @@
     const cards = $$("[data-post-row]", postsBox);
     if (cards.length) $("[data-post-title]", cards[cards.length - 1]).focus();
   });
+
+  $("[data-community-refresh]")?.addEventListener("click", () => loadCommunityAdmin());
 
   $("[data-reload]").addEventListener("click", () => {
     openEditor(sessionLogin);

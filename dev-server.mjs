@@ -27,6 +27,10 @@ import { onRequestGet as getWhere } from "./functions/api/where.js";
 import { onRequestGet as getStatus } from "./functions/api/status.js";
 import { onRequestGet as getBlog, onRequestPost as postBlog } from "./functions/api/blog.js";
 import { onRequestGet as getProjectMeta } from "./functions/api/project-meta.js";
+import {
+  onRequestGet as getCommunity,
+  onRequestPost as postCommunity,
+} from "./functions/api/community.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -175,6 +179,12 @@ const server = createServer(async (req, res) => {
           });
         }
         return proxy(res, await getProjectMeta(context));
+      }
+      if (pathname === "/api/community") {
+        return proxy(
+          res,
+          req.method === "POST" ? await postCommunity(context) : await getCommunity(context)
+        );
       }
 
       return send(res, 404, JSON.stringify({ ok: false, error: "not found" }), {

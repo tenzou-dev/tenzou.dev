@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>projects — tenzou.dev</title>
-  <meta name="description" content="Selected work and public repositories from Tenzou.">
+  <meta name="description" content="Selected work, public repositories, and community projects from Tenzou.">
   <meta name="theme-color" content="#000000">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
@@ -38,11 +38,84 @@
     <main class="page">
       <p class="kicker">/projects</p>
       <h1 class="page-title">Projects.</h1>
-      <p class="page-sub" data-projects-sub>Selected work and public repositories.</p>
+      <p class="page-sub" data-projects-sub>
+        <span data-projects-sub-mine>Selected work and public repositories.</span>
+        <span data-projects-sub-community hidden>Repo pilihan dari orang lain — untuk dibaca, dicoba, dan diajak kolaborasi.</span>
+      </p>
 
-      <ul class="list" data-projects>
-        <li><p class="list-note">memuat…</p></li>
-      </ul>
+      <div class="projects-bar">
+        <div class="projects-tabs" role="tablist" aria-label="Jenis project">
+          <button class="projects-tab is-active" type="button" role="tab" aria-selected="true" data-projects-tab="mine">project saya</button>
+          <button class="projects-tab" type="button" role="tab" aria-selected="false" data-projects-tab="community">komunitas <span class="tab-count" data-community-count hidden></span></button>
+        </div>
+        <button class="btn btn--ghost btn--sm" type="button" data-community-open hidden>+ tambah</button>
+      </div>
+
+      <section class="projects-pane" role="tabpanel" data-projects-pane="mine">
+        <ul class="list" data-projects>
+          <li><p class="list-note">memuat…</p></li>
+        </ul>
+      </section>
+
+      <section class="projects-pane" role="tabpanel" data-projects-pane="community" hidden>
+        <div class="community-list" data-community>
+          <p class="list-note">memuat…</p>
+        </div>
+
+        <form class="community-form" data-community-form hidden novalidate>
+          <div class="panel-head">
+            <h2 class="panel-title">tambah project</h2>
+            <button class="icon-btn" type="button" data-community-close aria-label="tutup form">×</button>
+          </div>
+          <p class="hint">Repo kamu akan dicek otomatis lewat GitHub, lalu direview sebelum tampil. Jangan kirim repo pribadi atau yang tidak publik.</p>
+
+          <div class="grid-2">
+            <label class="field">
+              <span class="field-label">judul project</span>
+              <input class="input" type="text" name="title" maxlength="80" placeholder="nama project" required>
+            </label>
+            <label class="field">
+              <span class="field-label">nama kamu (opsional)</span>
+              <input class="input" type="text" name="author" maxlength="60" placeholder="nama atau handle">
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field-label">deskripsi</span>
+            <textarea class="input textarea" name="description" rows="3" maxlength="400" placeholder="project ini dibuat untuk apa?" required></textarea>
+          </label>
+
+          <label class="field">
+            <span class="field-label">link repo github</span>
+            <input class="input" type="text" inputmode="url" name="repo" maxlength="300" placeholder="https://github.com/username/repo" required>
+          </label>
+
+          <label class="field">
+            <span class="field-label">threads / sosmed (utamakan threads)</span>
+            <input class="input" type="text" name="social" maxlength="300" placeholder="@username atau https://www.threads.com/@username">
+          </label>
+
+          <label class="field">
+            <span class="field-label">link demo (opsional)</span>
+            <input class="input" type="text" inputmode="url" name="demo" maxlength="300" placeholder="https://…">
+          </label>
+
+          <label class="hp" aria-hidden="true">
+            <span>website</span>
+            <input class="input" type="text" name="website" tabindex="-1" autocomplete="off">
+          </label>
+
+          <label class="consent">
+            <input type="checkbox" name="consent" required>
+            <span>Saya setuju project ini ditampilkan di tenzou.dev sebagai bagian dari komunitas, dan saya berhak membagikan repo ini.</span>
+          </label>
+
+          <div class="community-form-actions">
+            <button class="btn" type="submit">kirim project</button>
+            <span class="status" data-community-status role="status"></span>
+          </div>
+        </form>
+      </section>
 
       <a class="back" href="index.html">← back home</a>
     </main>

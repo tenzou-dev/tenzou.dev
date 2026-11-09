@@ -68,6 +68,7 @@
         <nav class="admin-tabs" role="tablist" aria-label="Bagian admin">
           <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" data-admin-tab="profile">profil</button>
           <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="projects">project</button>
+          <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="community">komunitas</button>
           <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="posts">tulisan</button>
           <button class="admin-tab" type="button" role="tab" aria-selected="false" data-admin-tab="socials">sosial</button>
         </nav>
@@ -120,6 +121,19 @@
           </div>
           <p class="hint">Tampil di /projects bersama repo publik GitHub. Bahasa/stack dideteksi otomatis dari link.</p>
           <div class="editor-list" data-projects-editor></div>
+        </section>
+
+        <section class="panel" role="tabpanel" data-tab-panel="community" hidden>
+          <div class="panel-head">
+            <h2 class="panel-title">project komunitas</h2>
+            <div class="panel-head-actions">
+              <a class="btn btn--ghost btn--sm" href="projects.html#komunitas-tambah" target="_blank" rel="noopener">+ tambah manual</a>
+              <button class="btn btn--ghost btn--sm" type="button" data-community-refresh>muat ulang</button>
+            </div>
+          </div>
+          <p class="hint">Kiriman pengunjung dari /projects → komunitas. Setujui untuk menampilkannya, tolak untuk menghapus dari antrean. Repo sudah dicek ke GitHub saat dikirim. Selama login sebagai admin, project yang kamu tambahkan lewat form langsung tampil.</p>
+          <div class="editor-list" data-community-editor></div>
+          <p class="status" data-community-status role="status"></p>
         </section>
 
         <section class="panel" role="tabpanel" data-tab-panel="socials" hidden>
