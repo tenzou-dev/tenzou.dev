@@ -667,10 +667,12 @@ body[data-page="projects"] .row-title {
 
 .community-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
 .gh-card {
+  min-width: 0;
   padding: 14px 16px 13px;
   border: 1px solid var(--hair);
   border-radius: 8px;
@@ -746,12 +748,12 @@ body[data-page="projects"] .row-title {
   font-size: 14.5px;
   font-weight: 600;
   line-height: 1.35;
+  overflow-wrap: anywhere;
   text-wrap: pretty;
 }
 
 .gh-stars {
   flex: none;
-  margin-left: 8px;
   color: var(--dim);
   font-size: 11.5px;
   white-space: nowrap;
@@ -762,6 +764,7 @@ body[data-page="projects"] .row-title {
   color: var(--dim);
   font-size: 13px;
   line-height: 1.55;
+  overflow-wrap: anywhere;
   text-wrap: pretty;
 }
 
@@ -1688,6 +1691,13 @@ body[data-page="blog"] .row-title {
   .grid-2,
   .editor-card-meta {
     grid-template-columns: 1fr;
+  }
+
+  .gh-repo {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
   }
 
   .editor-row {
