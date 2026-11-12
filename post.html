@@ -19,6 +19,8 @@
       if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
       var font = localStorage.getItem("tenzou-font");
       if (font) document.documentElement.dataset.font = font;
+      var accent = localStorage.getItem("tenzou-accent");
+      if (accent) document.documentElement.dataset.accent = accent;
     } catch (e) {}
   </script>
 </head>

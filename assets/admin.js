@@ -813,6 +813,13 @@
         window.tzApplyFont(fontField.value);
       }
     }
+    const accentField = $('[data-field="accent"]');
+    if (accentField) {
+      accentField.value = content.accent || "hijau";
+      if (typeof window.tzApplyAccent === "function") {
+        window.tzApplyAccent(accentField.value);
+      }
+    }
     const backgroundField = $('[data-field="background"]');
     const opacityField = $('[data-field="backgroundOpacity"]');
     if (backgroundField) backgroundField.value = content.background || "code";
@@ -837,6 +844,7 @@
       backgroundOpacity: $('[data-field="backgroundOpacity"]')
         ? Number($('[data-field="backgroundOpacity"]').value)
         : 12,
+      accent: $('[data-field="accent"]') ? $('[data-field="accent"]').value : "hijau",
       projects: $$("[data-project-row]", projectsBox)
         .map((card) => ({
           title: $("[data-project-title]", card).value.trim(),
@@ -975,6 +983,18 @@
     }, 350);
   });
 
+  let accentSaveTimer;
+  $('[data-field="accent"]')?.addEventListener("change", (event) => {
+    if (typeof window.tzApplyAccent === "function") {
+      window.tzApplyAccent(event.target.value);
+    }
+
+    clearTimeout(accentSaveTimer);
+    accentSaveTimer = setTimeout(() => {
+      if (!editorForm.hidden) editorForm.requestSubmit();
+    }, 350);
+  });
+
   $('[data-field="background"]')?.addEventListener("change", () => {
     syncBackgroundPreview(false);
   });
@@ -1031,6 +1051,11 @@
       const fontField = $('[data-field="font"]');
       if (fontField && typeof window.tzApplyFont === "function") {
         window.tzApplyFont(fontField.value);
+      }
+
+      const accentField = $('[data-field="accent"]');
+      if (accentField && typeof window.tzApplyAccent === "function") {
+        window.tzApplyAccent(accentField.value);
       }
 
       syncBackgroundPreview(true);

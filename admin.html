@@ -19,6 +19,8 @@
       if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
       var font = localStorage.getItem("tenzou-font");
       if (font) document.documentElement.dataset.font = font;
+      var accent = localStorage.getItem("tenzou-accent");
+      if (accent) document.documentElement.dataset.accent = accent;
     } catch (e) {}
   </script>
 </head>
@@ -94,6 +96,18 @@
               <option value="space">Space Mono</option>
               <option value="fira">Fira Code</option>
               <option value="system">System monospace</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">warna aksen — langsung tersimpan saat dipilih</span>
+            <select class="input select" data-field="accent">
+              <option value="hijau">hijau (default)</option>
+              <option value="kuning">kuning</option>
+              <option value="biru">biru</option>
+              <option value="ungu">ungu</option>
+              <option value="oranye">oranye</option>
+              <option value="merah">merah</option>
+              <option value="mono">mono (hitam-putih)</option>
             </select>
           </label>
           <label class="field">

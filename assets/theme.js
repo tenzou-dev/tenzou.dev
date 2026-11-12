@@ -3,6 +3,8 @@
   const THEME_KEY = "tenzou-theme";
   const FONT_KEY = "tenzou-font";
   const FONTS = ["jetbrains", "ibm", "space", "fira", "system"];
+  const ACCENT_KEY = "tenzou-accent";
+  const ACCENTS = ["hijau", "kuning", "biru", "ungu", "oranye", "merah", "mono"];
   const BG_KEY = "tenzou-bg";
   const BG_OPACITY_KEY = "tenzou-bg-opacity";
   const BACKGROUNDS = ["none", "code", "grid"];
@@ -15,6 +17,16 @@
     root.dataset.font = font;
     try {
       localStorage.setItem(FONT_KEY, font);
+    } catch (e) {
+      /* storage blocked */
+    }
+  };
+
+  window.tzApplyAccent = (name) => {
+    const accent = ACCENTS.includes(name) ? name : "hijau";
+    root.dataset.accent = accent;
+    try {
+      localStorage.setItem(ACCENT_KEY, accent);
     } catch (e) {
       /* storage blocked */
     }

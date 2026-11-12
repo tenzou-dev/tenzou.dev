@@ -211,6 +211,9 @@
     if (typeof window.tzApplyBackground === "function") {
       window.tzApplyBackground(content.background, content.backgroundOpacity);
     }
+    if (typeof window.tzApplyAccent === "function") {
+      window.tzApplyAccent(content.accent);
+    }
   }
 
   function renderName(el, name) {
@@ -966,6 +969,162 @@
     });
   }
 
+  function hostOf(value) {
+    try {
+      return new URL(value).hostname.replace(/^www\./i, "");
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function repoOwner(repo) {
+    const owner = String((repo && repo.owner) || "").trim();
+    if (owner) return owner;
+    const match = String((repo && repo.html_url) || "").match(/github\.com\/([^/]+)/i);
+    return match ? match[1] : "github";
+  }
+
+  function cardAvatar(owner, avatarUrl, allowGithub) {
+    const wrap = document.createElement("span");
+    wrap.className = "gh-avatar-wrap";
+    const letter = String(owner || "").charAt(0).toUpperCase() || "?";
+
+    const src =
+      safeUrl(avatarUrl, false) ||
+      (allowGithub && owner
+        ? "https://github.com/" + encodeURIComponent(owner) + ".png?size=80"
+        : "");
+
+    const showLetter = () => {
+      const img = wrap.querySelector("img");
+      if (img) img.remove();
+      wrap.classList.add("is-letter");
+      wrap.textContent = letter;
+    };
+
+    if (!src) {
+      showLetter();
+      return wrap;
+    }
+
+    const img = document.createElement("img");
+    img.className = "gh-avatar";
+    img.alt = "";
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.width = 40;
+    img.height = 40;
+    img.referrerPolicy = "no-referrer";
+    img.src = src;
+    img.addEventListener("error", showLetter, { once: true });
+    wrap.append(img);
+    return wrap;
+  }
+
+  function cardMetaLink(meta, href, label) {
+    const url = safeUrl(href, false);
+    if (!url) return;
+    const link = document.createElement("a");
+    link.className = "gh-social";
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = label;
+    meta.append(link);
+  }
+
+  function cardMetaLanguage(meta, language) {
+    const lang = document.createElement("span");
+    lang.className = "gh-lang";
+    const dot = document.createElement("span");
+    dot.className = "gh-dot";
+    dot.style.background = LANGUAGE_COLORS[language] || "var(--dim)";
+    lang.append(dot, language);
+    meta.append(lang);
+  }
+
+  /** GitHub-style card used by the "project saya" tab. */
+  function projectCard(options) {
+    const li = document.createElement("li");
+    const card = document.createElement("article");
+    card.className = "gh-card";
+
+    const head = document.createElement("div");
+    head.className = "gh-head";
+
+    const owner = String(options.owner || "").trim();
+    head.append(cardAvatar(owner || options.title, options.avatar, Boolean(options.github)));
+
+    const ident = document.createElement("div");
+    ident.className = "gh-ident";
+
+    const labelText = String(options.label || "").trim();
+    const url = safeUrl(options.url, false);
+
+    if (labelText) {
+      const line = document.createElement(url ? "a" : "span");
+      line.className = "gh-repo";
+      if (url) {
+        line.href = url;
+        line.target = "_blank";
+        line.rel = "noopener noreferrer";
+      }
+
+      if (options.name) {
+        const ownerSpan = document.createElement("span");
+        ownerSpan.className = "gh-owner";
+        ownerSpan.textContent = owner;
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "gh-name";
+        nameSpan.textContent = String(options.name);
+
+        line.append(ownerSpan, " / ", nameSpan);
+      } else {
+        line.textContent = labelText;
+      }
+
+      ident.append(line);
+    }
+
+    const titleText = String(options.title || "").trim();
+    if (titleText) {
+      const title = document.createElement("p");
+      title.className = "gh-title";
+      title.textContent = titleText;
+      ident.append(title);
+    }
+
+    head.append(ident);
+
+    const stars = Math.max(0, Math.floor(Number(options.stars) || 0));
+    if (stars > 0) {
+      const star = document.createElement("span");
+      star.className = "gh-stars";
+      star.textContent = "★ " + stars;
+      star.title = stars + " stars";
+      head.append(star);
+    }
+
+    card.append(head);
+
+    const description = String(options.description || "").trim();
+    if (description) {
+      const desc = document.createElement("p");
+      desc.className = "gh-desc";
+      desc.textContent = description;
+      card.append(desc);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "gh-meta";
+    if (typeof options.fillMeta === "function") options.fillMeta(meta);
+    if (meta.childElementCount) card.append(meta);
+
+    li.append(card);
+    return li;
+  }
+
   function renderProjects(content) {
     initProjectTabs();
     setupCommunityForm();
@@ -1009,134 +1168,91 @@
 
     const paint = (repos, emptyNote) => {
       list.textContent = "";
+      list.className = "project-cards";
 
       manual.forEach((project) => {
-        const li = document.createElement("li");
         const url = safeUrl(project.url, false);
-        const row = url ? document.createElement("a") : document.createElement("span");
-        row.className = "row";
+        const stack = project.stack
+          ? String(project.stack)
+              .split(/\s*[·|]\s*/)
+              .map((label) => label.trim())
+              .filter(Boolean)
+              .slice(0, 8)
+          : [];
 
-        if (url) {
-          row.href = url;
-          if (/^https?:/i.test(url)) {
-            row.target = "_blank";
-            row.rel = "noopener noreferrer";
-          }
-        }
+        list.append(
+          projectCard({
+            owner: project.title,
+            label: url ? hostOf(url) : "selected work",
+            url,
+            title: String(project.title || "").trim(),
+            description: project.description,
+            fillMeta(meta) {
+              if (project.meta) {
+                const metaText = document.createElement("span");
+                metaText.textContent = String(project.meta).trim();
+                meta.append(metaText);
+              }
 
-        const title = document.createElement("span");
-        title.className = "row-title";
-        title.textContent = String(project.title || "").trim();
+              stack.forEach((label) => {
+                const badge = document.createElement("span");
+                badge.className = "badge";
+                badge.textContent = label;
+                meta.append(badge);
+              });
 
-        const side = document.createElement("span");
-        side.className = "row-side";
-
-        if (project.meta) {
-          const meta = document.createElement("span");
-          meta.className = "row-meta";
-          meta.textContent = String(project.meta).trim();
-          side.append(meta);
-        }
-
-        if (url) {
-          const arrow = document.createElement("span");
-          arrow.className = "row-arrow";
-          arrow.setAttribute("aria-hidden", "true");
-          arrow.textContent = "↗";
-          side.append(arrow);
-        }
-
-        const badges = document.createElement("span");
-        badges.className = "row-badges";
-
-        if (project.stack) {
-          const labels = String(project.stack)
-            .split(/\s*[·|]\s*/)
-            .map((label) => label.trim())
-            .filter(Boolean)
-            .slice(0, 8);
-
-          labels.forEach((label) => {
-            const badge = document.createElement("span");
-            badge.className = "badge";
-            badge.textContent = label;
-            badges.append(badge);
-          });
-        }
-
-        row.append(title);
-        if (side.childElementCount) row.append(side);
-        if (badges.childElementCount) row.append(badges);
-
-        li.append(row);
-
-        if (project.description) {
-          const desc = document.createElement("p");
-          desc.className = "row-desc";
-          desc.textContent = String(project.description).trim();
-          li.append(desc);
-        }
-
-        list.append(li);
+              if (url) cardMetaLink(meta, url, "buka ↗");
+            },
+          })
+        );
       });
 
       repos
         .filter((repo) => !manualUrls.has(repo.html_url))
         .forEach((repo) => {
-          const li = document.createElement("li");
-          const link = document.createElement("a");
-          link.className = "row";
-          link.href = repo.html_url;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
+          const repoUrl = safeUrl(repo.html_url, false);
+          if (!repoUrl) return;
 
-          const title = document.createElement("span");
-          title.className = "row-title";
-          title.textContent = repo.name;
+          const owner = repoOwner(repo);
+          const name = String(repo.name || "").trim();
 
-          const side = document.createElement("span");
-          side.className = "row-side";
+          list.append(
+            projectCard({
+              owner,
+              name,
+              label: owner + " / " + name,
+              url: repoUrl,
+              avatar: repo.avatar,
+              github: true,
+              stars: repo.stargazers_count,
+              description: repo.description,
+              fillMeta(meta) {
+                if (repo.language) cardMetaLanguage(meta, repo.language);
 
-          const metaBits = [];
-          if (repo.stargazers_count > 0) metaBits.push("★ " + repo.stargazers_count);
-          if (repo.archived) metaBits.push("archived");
+                if (repo.license) {
+                  const license = document.createElement("span");
+                  license.textContent = repo.license;
+                  meta.append(license);
+                }
 
-          if (metaBits.length) {
-            const meta = document.createElement("span");
-            meta.className = "row-meta";
-            meta.textContent = metaBits.join(" · ");
-            side.append(meta);
-          }
+                const pushed = String(repo.pushed_at || "").slice(0, 10);
+                if (/^\d{4}-\d{2}-\d{2}$/.test(pushed)) {
+                  const updated = document.createElement("span");
+                  updated.textContent = "updated " + formatDate(pushed);
+                  meta.append(updated);
+                }
 
-          const arrow = document.createElement("span");
-          arrow.className = "row-arrow";
-          arrow.setAttribute("aria-hidden", "true");
-          arrow.textContent = "↗";
-          side.append(arrow);
+                if (repo.archived) {
+                  const archived = document.createElement("span");
+                  archived.textContent = "archived";
+                  meta.append(archived);
+                }
 
-          const badges = document.createElement("span");
-          badges.className = "row-badges";
-
-          if (repo.language) {
-            const badge = document.createElement("span");
-            badge.className = "badge";
-            badge.textContent = repo.language;
-            badges.append(badge);
-          }
-
-          link.append(title);
-          if (side.childElementCount) link.append(side);
-          if (badges.childElementCount) link.append(badges);
-          li.append(link);
-
-          if (repo.description) {
-            const desc = document.createElement("p");
-            desc.className = "row-desc";
-            desc.textContent = repo.description;
-            li.append(desc);
-          }
-
-          list.append(li);
+                cardMetaLink(meta, repo.homepage, "demo ↗");
+                cardMetaLink(meta, repoUrl, "repo ↗");
+              },
+            })
+          );
         });
 
       if (!list.children.length && emptyNote) {
@@ -1192,6 +1308,14 @@
             language: repo.language,
             stargazers_count: repo.stargazers_count,
             archived: repo.archived,
+            owner: repo.owner && repo.owner.login,
+            avatar: repo.owner && repo.owner.avatar_url,
+            homepage: repo.homepage,
+            pushed_at: repo.pushed_at,
+            license:
+              repo.license && repo.license.spdx_id && repo.license.spdx_id !== "NOASSERTION"
+                ? repo.license.spdx_id
+                : "",
           }));
 
         try {

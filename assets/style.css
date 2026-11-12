@@ -18,6 +18,8 @@
   --fg: #ececec;
   --dim: #8a8a8a;
   --hair: #232323;
+  --accent: #7ee787;
+  --accent-soft: rgba(126, 231, 135, 0.14);
   --toast-bg: #ececec;
   --toast-fg: #000000;
   --ok: #6ee7a8;
@@ -47,6 +49,36 @@ html[data-font="system"] {
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+html[data-accent="kuning"] {
+  --accent: #e3b341;
+  --accent-soft: rgba(227, 179, 65, 0.14);
+}
+
+html[data-accent="biru"] {
+  --accent: #79c0ff;
+  --accent-soft: rgba(121, 192, 255, 0.14);
+}
+
+html[data-accent="ungu"] {
+  --accent: #d2a8ff;
+  --accent-soft: rgba(210, 168, 255, 0.14);
+}
+
+html[data-accent="oranye"] {
+  --accent: #ffa657;
+  --accent-soft: rgba(255, 166, 87, 0.14);
+}
+
+html[data-accent="merah"] {
+  --accent: #ff7b72;
+  --accent-soft: rgba(255, 123, 114, 0.14);
+}
+
+html[data-accent="mono"] {
+  --accent: #ececec;
+  --accent-soft: rgba(236, 236, 236, 0.1);
+}
+
 html[data-theme="light"] {
   --bg: #f3f1ec;
   --fg: #14140f;
@@ -59,6 +91,41 @@ html[data-theme="light"] {
   --tok-code: #2f7a3f;
   --tok-strong: #6b46c1;
   color-scheme: light;
+}
+
+html[data-theme="light"][data-accent="hijau"] {
+  --accent: #1a7f37;
+  --accent-soft: rgba(26, 127, 55, 0.12);
+}
+
+html[data-theme="light"][data-accent="kuning"] {
+  --accent: #9a6700;
+  --accent-soft: rgba(154, 103, 0, 0.12);
+}
+
+html[data-theme="light"][data-accent="biru"] {
+  --accent: #0969da;
+  --accent-soft: rgba(9, 105, 218, 0.12);
+}
+
+html[data-theme="light"][data-accent="ungu"] {
+  --accent: #8250df;
+  --accent-soft: rgba(130, 80, 223, 0.12);
+}
+
+html[data-theme="light"][data-accent="oranye"] {
+  --accent: #bc4c00;
+  --accent-soft: rgba(188, 76, 0, 0.12);
+}
+
+html[data-theme="light"][data-accent="merah"] {
+  --accent: #cf222e;
+  --accent-soft: rgba(207, 34, 46, 0.12);
+}
+
+html[data-theme="light"][data-accent="mono"] {
+  --accent: #14140f;
+  --accent-soft: rgba(20, 20, 15, 0.08);
 }
 
 html,
@@ -511,6 +578,7 @@ body.content-ready .hero {
 }
 
 .row-title {
+  color: var(--accent);
   font-size: clamp(14.5px, 3.9vw, 15.5px);
 }
 
@@ -593,14 +661,14 @@ body[data-page="projects"] .row-title {
 }
 
 .inline-link {
-  color: var(--fg);
+  color: var(--accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
 .inline-link:hover {
-  color: var(--dim);
+  color: var(--fg);
 }
 
 .back {
@@ -655,7 +723,8 @@ body[data-page="projects"] .row-title {
 
 .projects-tab.is-active {
   border-color: var(--hair);
-  color: var(--fg);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .tab-count {
@@ -665,10 +734,21 @@ body[data-page="projects"] .row-title {
   font-size: 11px;
 }
 
-.community-list {
+.community-list,
+.project-cards {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+}
+
+.project-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-cards > li {
+  min-width: 0;
 }
 
 .gh-card {
@@ -739,12 +819,12 @@ body[data-page="projects"] .row-title {
 }
 
 .gh-name {
-  color: var(--fg);
+  color: var(--accent);
 }
 
 .gh-title {
   margin: 3px 0 0;
-  color: var(--fg);
+  color: var(--accent);
   font-size: 14.5px;
   font-weight: 600;
   line-height: 1.35;
@@ -754,7 +834,7 @@ body[data-page="projects"] .row-title {
 
 .gh-stars {
   flex: none;
-  color: var(--dim);
+  color: var(--accent);
   font-size: 11.5px;
   white-space: nowrap;
 }
@@ -801,7 +881,7 @@ body[data-page="projects"] .row-title {
 }
 
 .gh-social:hover {
-  color: var(--fg);
+  color: var(--accent);
 }
 
 .gh-social-icon {

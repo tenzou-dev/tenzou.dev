@@ -31,6 +31,7 @@ const SOCIAL_TYPES = new Set([
 ]);
 const FONTS = new Set(["jetbrains", "ibm", "space", "fira", "system"]);
 const BACKGROUNDS = new Set(["none", "code", "grid"]);
+const ACCENTS = new Set(["hijau", "kuning", "biru", "ungu", "oranye", "merah", "mono"]);
 const GITHUB_USER = /^[A-Za-z0-9-]{1,39}$/;
 
 function slugify(value) {
@@ -134,6 +135,7 @@ function sanitize(input) {
     intro: text(data.intro, 700),
     version: text(data.version, 40),
     font: FONTS.has(data.font) ? data.font : "jetbrains",
+    accent: ACCENTS.has(data.accent) ? data.accent : "hijau",
     background: BACKGROUNDS.has(data.background) ? data.background : "code",
     backgroundOpacity: Number.isFinite(backgroundOpacity)
       ? Math.min(100, Math.max(0, Math.round(backgroundOpacity)))

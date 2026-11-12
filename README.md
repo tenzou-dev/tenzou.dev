@@ -180,6 +180,11 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
   IBM Plex Mono, Space Mono, Fira Code, dan system monospace. Memilih font langsung
   menyimpan konten (jadi berlaku untuk semua pengunjung) dan nilai terakhir juga
   di-cache di `localStorage` (`tenzou-font`) supaya tidak berkedip saat reload.
+- **Warna aksen**: judul project, nama repo, bintang, tautan, dan judul tulisan
+  memakai warna aksen. Pilih lewat `/admin` → tab **profil** → **warna aksen**:
+  hijau (default), kuning, biru, ungu, oranye, merah, atau mono. Nilainya disimpan
+  di konten (`accent`) dan di-cache di `localStorage` (`tenzou-accent`) agar tidak
+  berkedip saat reload. Varian warna otomatis menyesuaikan tema terang/gelap.
 - **Background home**: halaman home punya lapisan dekoratif tipis di belakang konten.
   Pilih gaya lewat `/admin` → tab **profil** → **background home**: `kode` (potongan
   kode, default), `grid` (grid titik), atau `none`. Geser **opasitas background**
@@ -205,7 +210,7 @@ menekan **simpan** di `/admin`, isi KV yang dipakai.
 
 | Hal | Di mana |
 | --- | --- |
-| Nama, intro, username GitHub, font, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
+| Nama, intro, username GitHub, font, warna aksen, sosial, tulisan | `/admin` (atau `content.json` untuk default) |
 | Artikel + tag | `/admin` → tab **tulisan** (tag dipisah koma) |
 | Project manual (di luar GitHub) | `/admin` → tab **project** (stack terisi otomatis dari URL) |
 | Project komunitas (kiriman pengunjung) | `/admin` → tab **komunitas** (setujui / tolak) |
